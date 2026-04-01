@@ -3,24 +3,11 @@
   "trailingSlash": false,
   "headers": [
     {
-      "source": "**/*.vrm",
+      "source": "/(.*)",
       "headers": [
         {
-          "key": "Content-Type",
-          "value": "application/octet-stream"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "**/*.glb",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "model/gltf-binary"
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
         }
       ]
     }
