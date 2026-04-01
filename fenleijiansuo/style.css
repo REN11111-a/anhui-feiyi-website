@@ -1,0 +1,270 @@
+/* 完全还原您提供的标准样式，仅新增功能相关样式 */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* ✅ 完全还原标准header样式（和您给的代码一字不差） */
+header {
+    background-color: black;
+    height: 80px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+}
+
+header ul {
+    position: absolute;
+    right: 5vw;
+    top: 0;
+    line-height: 80px;
+    list-style: none;
+}
+
+h1 {
+    color: white;
+    position: absolute;
+    left: 50px;
+    top: 2px;
+    width: 400px;          /* 根据需要调整logo宽度 */
+    height: 80px;
+    line-height: 60px;
+    background-image: url(../images/logo1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    text-indent: -9999px;
+}
+
+header li {
+    display: inline;
+    margin-right: 4vw;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+
+header a:hover {
+    text-decoration: underline;
+}
+
+/* ✅ 完全还原标准footer样式（和您给的代码一字不差） */
+/* 底部按钮 */
+footer a {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    color: white;
+    text-decoration: none;
+    border: 3px solid #ACACAC;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.5);
+    text-align: center;
+    z-index: 1000;
+}
+
+/* 以下为功能优化样式（保留所有分页/列宽/白线等优化，仅确保无横向滚动） */
+/* 基础布局 - 消除横向滚动核心 */
+html, body {
+    width: 100%;
+    overflow-x: hidden; /* 全局禁止横向滚动 */
+}
+
+/* 分类检索页面功能区样式（保留优化） */
+.search-main {
+    width: 100%;
+    min-height: calc(100vh - 120px);
+    padding: 100px 5vw 60px; /* 还原标准内边距基准 */
+    background-color: #f8f8f8;
+}
+
+.search-filter {
+    width: 100%;
+    max-width: 1200px; /* 还原标准最大宽度 */
+    margin: 0 auto 30px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #333;
+}
+
+.filter-item label {
+    margin-right: 10px;
+    font-weight: 500;
+}
+
+.filter-item select,
+.filter-item input {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.filter-item select {
+    min-width: 180px;
+}
+
+.search-box {
+    margin-left: auto;
+    display: flex;
+}
+
+.search-box input {
+    min-width: 280px;
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+}
+
+.search-box button {
+    height: 40px;
+    padding: 0 20px;
+    background-color: #c8102e;
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.search-box button:hover {
+    background-color: #a80e26;
+}
+
+/* 表格容器 - 消除横向滚动 */
+.heritage-table-wrap {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden; /* 禁止容器内横向滚动 */
+}
+
+.heritage-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+    table-layout: fixed; /* 固定表格布局，防止列宽溢出 */
+}
+
+.heritage-table thead tr {
+    background-color: #c8102e;
+    color: white;
+}
+
+/* 表头白色竖线分隔 + 列宽分配（保留优化） */
+.heritage-table th {
+    padding: 15px 10px;
+    font-weight: normal;
+    font-size: 15px;
+    border-right: 1px solid white; /* 白色竖线分隔列 */
+}
+.heritage-table th:last-child {
+    border-right: none; /* 最后一列取消竖线 */
+}
+
+/* 各列宽度调整（保留优化） */
+.heritage-table th:nth-child(1),
+.heritage-table td:nth-child(1) {
+    width: 8%;   /* 序号列较窄 */
+}
+.heritage-table th:nth-child(2),
+.heritage-table td:nth-child(2) {
+    width: 25%;  /* 非遗名称 */
+}
+.heritage-table th:nth-child(3),
+.heritage-table td:nth-child(3) {
+    width: 15%;  /* 类别 */
+}
+.heritage-table th:nth-child(4),
+.heritage-table td:nth-child(4) {
+    width: 22%;  /* 申报地区/单位 */
+}
+.heritage-table th:nth-child(5),
+.heritage-table td:nth-child(5) {
+    width: 30%;  /* 保护单位列更宽，适配长文本 */
+}
+
+.heritage-table tbody td {
+    padding: 12px 10px;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 超长文本省略，避免横向滚动 */
+}
+
+.heritage-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* 分页控件样式（保留优化） */
+.pagination-wrap {
+    max-width: 1200px;
+    margin: 20px auto 0;
+    text-align: center;
+    padding: 0 10px; /* 左右内边距，避免溢出 */
+}
+.pagination {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap; /* 小屏自动换行，无横向滚动 */
+}
+.pagination button {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    white-space: nowrap; /* 按钮文字不换行 */
+}
+.pagination button:hover:not(:disabled) {
+    border-color: #c8102e;
+    color: #c8102e;
+}
+.pagination button.active {
+    background-color: #c8102e;
+    color: #fff;
+    border-color: #c8102e;
+}
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 响应式适配（保留优化） */
+@media (max-width: 992px) {
+    .search-filter {
+        gap: 20px;
+    }
+    .search-box {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 10px;
+    }
+    .search-box input {
+        flex: 1;
+        min-width: unset;
+    }
+}

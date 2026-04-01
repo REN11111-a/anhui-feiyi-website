@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智承皖遗 - 淮南市非遗文化</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/jquery.maphilight.min.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="../js/three-vrm.js"></script>
+    <script src="../shuziren/js/vrm-core.js"></script>
+    <script src="../shuziren/js/introduce.js"></script>
+     <!-- ========== 新增：引入通用浏览历史函数文件 ========== -->
+    <script src="../js/common.js"></script>
+</head>
+<body>
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="../index.html">首页</a></li>
+        <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="../women/women.html">关于我们</a></li>
+        <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+    <main>
+        <section class="hero-section">
+            <img src="../images/寿州窑陶瓷制作技艺.jpg" alt="淮南非遗风光" class="hero-img">
+            <div class="hero-overlay">
+                <h1>淮南非遗 · 楚风汉韵</h1>
+            </div>
+        </section>
+
+        <section class="intro-section">
+            <div class="container">
+                <div class="intro-row">
+                    <div class="intro-img">
+                        <img src="../images/淮南民风.jpg" alt="淮南非遗场景">
+                    </div>
+                    <div class="intro-text">
+                        <h2>淮南市非遗介绍</h2>
+                        <h3>什么是淮南非遗？</h3>
+                        <p>淮南地处淮河之滨，历史文化底蕴深厚，孕育了丰富的非物质文化遗产。这里既有推剧、谢郢锣鼓等地方艺术，也有寿州窑陶瓷制作技艺、豆腐传统制作技艺等传统技艺。</p>
+                        <p>淮南非遗承载着江淮地区的生活智慧与民俗记忆，体现了本地群众在戏曲、技艺、民俗活动与传统体育等方面的创造力与传承力。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="heritage-slider-section">
+            <div class="container">
+                <h2 class="section-title">淮南非遗精粹</h2>
+                <div class="heritage-category-list" id="heritageCategoryList"></div>
+                <div id="avatar-container" style="position: absolute; top: 50%; right: 80px; transform: translateY(-50%); width: 220px; height: 330px; z-index: 20; cursor: pointer; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: rgba(0,0,0,0.1);">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+    <script src="../js/data.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.map-img').maphilight({
+                fill: true,
+                fillColor: 'ffcc00',
+                fillOpacity: 0.5,
+                stroke: true,
+                strokeColor: 'ffffff',
+                strokeWidth: 2,
+                fade: true
+            });
+            $('canvas').css('pointer-events', 'none');
+        });
+  // ========== 核心新增：通用浏览记录函数 ==========
+        function addBrowseHistory(name) {
+            // 1. 构造蚌埠非遗详情页的完整路径（从profile.html出发）
+            const fullPath = `../detail/detail.html?name=${encodeURIComponent(name)}`;
+            // 2. 读取已有浏览记录
+            let browseHistory = JSON.parse(localStorage.getItem('browseHistory')) || [];
+            // 3. 去重：删除同名旧记录，避免重复
+            browseHistory = browseHistory.filter(item => item.name !== name);
+            // 4. 添加新记录（最新的在最前面）
+            browseHistory.unshift({
+                name: name,
+                time: new Date().toLocaleString('zh-CN', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                }), // 格式化时间，显示更规范
+                path: fullPath // 关键：存储带参数的真实跳转路径
+            });
+            // 5. 限制最多存储20条记录，防止数据冗余
+            browseHistory = browseHistory.slice(0, 20);
+            // 6. 保存回本地存储
+            localStorage.setItem('browseHistory', JSON.stringify(browseHistory));
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('heritageCategoryList');
+            const imageMap = {
+                "火老虎": "../images/火老虎.jpg",
+                "推剧": "../images/推剧.jpg",
+                "紫金砚制作技艺": "../images/紫金砚制作技艺.jpg",
+                "豆腐传统制作技艺": "../images/豆腐传统制作技艺.jpg",
+                "谢郢锣鼓": "../images/谢郢锣鼓.jpg",
+                "马戏灯": "../images/马戏灯.jpg",
+                "六洲棋": "../images/六洲棋.jpg",
+                "采莲灯": "../images/采莲灯.jpg",
+                "藤牌对马": "../images/藤牌对马.jpg",
+                "永京拳": "../images/永京拳.jpg",
+                "寿州窑陶瓷制作技艺": "../images/寿州窑陶瓷制作技艺.jpg"
+            };
+
+            if (!Array.isArray(intangibleData)) {
+                container.innerHTML = '<p class="category-empty">数据加载失败，请稍后重试。</p>';
+                return;
+            }
+
+            const huainanItems = intangibleData.filter(item =>
+                item && typeof item.area === 'string' && item.area.includes('淮南市')
+            );
+            const uniqueHuainanItems = huainanItems.filter((item, index, arr) => {
+                const name = (item.name || '').trim();
+                return arr.findIndex(v => (v.name || '').trim() === name) === index;
+            });
+
+            const grouped = uniqueHuainanItems.reduce((acc, item) => {
+                const key = item.category || '其他';
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(item);
+                return acc;
+            }, {});
+
+            const categories = Object.keys(grouped);
+            if (!categories.length) {
+                container.innerHTML = '<p class="category-empty">暂无淮南市非遗数据。</p>';
+                return;
+            }
+
+            categories.forEach((category, index) => {
+                const rowId = 'categorySlider' + index;
+                const items = grouped[category];
+                const cardsHtml = items.map(item => {
+                    const image = imageMap[item.name] || '';
+                    const safeArea = (item.area || '').replace(/\n/g, ' / ');
+                    const safeUnit = item.protectUnit || '未登记';
+                    const imageHtml = image
+                        ? `<img src="${image}" alt="${item.name}" loading="lazy">`
+                        : `<div class="img-fallback">淮南非遗 · ${category}</div>`;
+                    return `
+                        <div class="heritage-card" data-name="${item.name.replace(/"/g, '&quot;')}">
+                            ${imageHtml}
+                            <h4>${item.name}</h4>
+                            <p>${category}</p>
+                            <div class="meta">地区：${safeArea}<br>保护单位：${safeUnit}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                const rowHtml = `
+                    <div class="heritage-category">
+                        <div class="category-header">
+                            <h3 class="category-title">${category}</h3>
+                            <div class="category-actions">
+                                <span class="category-count">${items.length} 项</span>
+                                <button class="slider-btn row-prev" data-row="${rowId}" aria-label="向左滑动"><i class="fa-solid fa-chevron-left"></i></button>
+                                <button class="slider-btn row-next" data-row="${rowId}" aria-label="向右滑动"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="category-slider-wrapper">
+                            <div class="category-slider" id="${rowId}">
+                                ${cardsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', rowHtml);
+            });
+
+            container.addEventListener('click', function(event) {
+                const prev = event.target.closest('.row-prev');
+                const next = event.target.closest('.row-next');
+                const card = event.target.closest('.heritage-card');
+
+                if (prev || next) {
+                    const btn = prev || next;
+                    const rowId = btn.getAttribute('data-row');
+                    const row = document.getElementById(rowId);
+                    if (row) {
+                        row.scrollBy({ left: prev ? -320 : 320, behavior: 'smooth' });
+                    }
+                    return;
+                }
+
+                if (card) {
+                    const name = card.getAttribute('data-name');
+                    if (name) {
+                           // ========== 新增：调用通用函数记录浏览历史 ==========
+                        addBrowseHistory(decodeURIComponent(name));
+                        window.location.href = `../detail/detail.html?name=${encodeURIComponent(name)}`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

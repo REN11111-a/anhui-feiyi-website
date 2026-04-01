@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人朋友圈 - 智承皖遗</title>
+    <link rel="stylesheet" href="css/moment.css">
+    <link rel="stylesheet" href="../haoyouhudong/haoyouhudong.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+    <style>
+        /* 封面编辑按钮 */
+        .cover-edit-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.4);
+            color: white;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+        }
+        .cover-edit-btn:hover {
+            background: rgba(0,0,0,0.6);
+        }
+
+        /* 返回按钮（不遮挡导航栏） */
+        .back-btn {
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            z-index: 999;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .back-btn:hover {
+            background: rgba(0,0,0,0.7);
+        }
+
+        /* 个人主页容器 */
+        .profile-container {
+            max-width: 800px;
+            margin: 100px auto 0;
+            padding-bottom: 40px;
+        }
+
+        /* 封面背景（默认渐变，无上传则白色） */
+        .profile-cover {
+            background: linear-gradient(135deg, #ff6868 0%, #764ba200 100%);
+            padding: 60px 20px 40px;
+            border-radius: 16px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        /* 头像 + 用户名 + 简介 */
+        .profile-info {
+            display: flex;
+            align-items: flex-end;
+            gap: 15px;
+            position: relative;
+            bottom: -5px;
+        }
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .profile-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .profile-bio {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            margin-top: 5px;
+        }
+
+        /* 操作按钮 */
+        .profile-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 40px;
+            margin-left: 105px;
+          
+        }
+        .profile-actions button {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .profile-actions button:hover {
+            background: #45a049;
+        }
+
+        /* 帖子时间轴 */
+        .moment-timeline {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 300px;
+        }
+        .empty-timeline {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* 朋友圈帖子卡片样式 */
+        .moment-card {
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+        .moment-card:last-child {
+            border-bottom: none;
+        }
+        .moment-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .moment-content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .moment-meta {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .moment-actions {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+        .moment-actions button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+        }
+        .moment-actions button:hover {
+            color: #667eea;
+        }
+
+        /* 评论区样式 */
+        .comment-list {
+            margin-top: 10px;
+            padding-left: 10px;
+            border-left: 2px solid #eee;
+        }
+        .comment-item {
+            padding: 4px 0;
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+        }
+        .comment-item:hover {
+            color: #667eea;
+        }
+        .comment-input-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .comment-input-bar input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            font-size: 14px;
+        }
+        .comment-input-bar button {
+            padding: 6px 12px;
+            border-radius: 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 → 好友互动 -->
+    <button class="back-btn" onclick="goBack()">
+        <i class="fa-solid fa-arrow-left"></i>
+    </button>
+
+    <!-- 顶部导航栏（和项目统一） -->
+    <header>
+        <h1>智承皖遗</h1>
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+            <li><a href="../women/women.html">关于我们</a></li>
+            <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+            <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+            <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+        </ul>
+    </header>
+
+    <!-- 个人主页主体 -->
+    <div class="profile-container">
+        <div class="profile-cover">
+            <button class="cover-edit-btn" id="coverEditBtn">
+                <i class="fa-solid fa-camera"></i> 更换封面
+            </button>
+            <input type="file" id="coverInput" style="display:none;" accept="image/*">
+
+            <div class="profile-info">
+                <img src="" class="profile-avatar" id="profileAvatar">
+                <div>
+                    <div class="profile-name" id="profileName">用户名</div>
+                    <div class="profile-bio" id="profileBio">这个人很懒，什么都没写~</div>
+                </div>
+            </div>
+           <div class="profile-actions" id="profileActions">
+                <button onclick="location.href='publish.html'">发布动态</button>
+                <button id="manageBtn">管理动态</button>
+                <button onclick="setGlobalPrivacy()">全局权限</button>
+            </div>
+        </div>
+
+        <!-- 帖子列表 -->
+        <div class="moment-timeline" id="momentTimeline">
+            <div class="empty-timeline">加载中...</div>
+        </div>
+
+        <!-- 管理模式：取消 + 删除 按钮 -->
+        <div id="manageBar" style="display:none; justify-content:flex-end; gap:12px; margin-top:12px; max-width:800px; margin-left:auto; margin-right:auto;">
+            <button id="cancelManage" style="padding:9px 18px; border-radius:20px; border:1px solid #ddd; background:#fff; cursor:pointer;">取消</button>
+            <button id="deleteSelected" style="padding:9px 18px; border-radius:20px; background:#ff4d4f; color:#fff; border:none; cursor:pointer;">删除选中</button>
+        </div>
+    </div>
+
+    <script src="../js/supabase-config.js"></script>
+    <script src="js/user-posts.js"></script>
+
+    <script>
+        function goBack() {
+            location.href = "../haoyouhudong/haoyouhudong.html";
+        }
+
+        // 点击帖子进入详情页
+        function openPostDetail(postId) {
+            localStorage.setItem('currentPostId', postId);
+            location.href = '../haoyouhudong/post-detail.html';
+        }
+    </script>
+</body>
+
+<!-- 发布弹窗 -->
+<div id="publishModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div class="modal-content" style="background:white; width:90%; max-width:450px; border-radius:16px; padding:20px; position:relative;">
+        <span class="close-modal" style="position:absolute; top:15px; right:15px; font-size:22px; cursor:pointer; color:#666;">&times;</span>
+        <h3 style="margin:0 0 20px; font-size:20px; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-pen-to-square"></i> 发布帖子
+        </h3>
+        <input type="text" id="postTitle" placeholder="标题" style="width:100%; padding:10px; margin-bottom:12px; border:1px solid #ddd; border-radius:8px;">
+        <textarea id="postContent" placeholder="分享你的非遗体验..." style="width:100%; height:100px; padding:10px; margin-bottom:12px; border:1px solid #ddd; border-radius:8px; resize:vertical;"></textarea>
+        <select id="postCategory" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px; background:white;">
+            <option value="">选择分类</option>
+            <option value="传统技艺">传统技艺</option>
+            <option value="传统音乐">传统音乐</option>
+            <option value="传统舞蹈">传统舞蹈</option>
+            <option value="传统戏剧">传统戏剧</option>
+            <option value="民间文学">民间文学</option>
+            <option value="民俗">民俗</option>
+            <option value="传统美术">传统美术</option>
+            <option value="传统医药">传统医药</option>
+        </select>
+        <button id="submitPostBtn" style="width:100%; padding:12px; background:linear-gradient(90deg, #667eea 0%, #764ba2 100%); color:white; border:none; border-radius:24px; font-size:16px; cursor:pointer;">发布帖子</button>
+    </div>
+</div>
+</html>

@@ -1,0 +1,230 @@
+/* 您的原有样式保持不变，仅微调了 h1 以适应新 logo */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+header {
+    background-color: black;
+    height: 80px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+}
+
+header ul {
+    position: absolute;
+    right: 5vw;
+    top: 0;
+    line-height: 80px;
+    list-style: none;
+}
+
+h1 {
+    color: white;
+    position: absolute;
+    left: 50px;
+    top: 2px;
+    width: 400px;          /* 根据需要调整logo宽度 */
+    height: 80px;
+    line-height: 60px;
+    background-image: url(../images/logo1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    text-indent: -9999px;
+}
+
+header li {
+    display: inline;
+    margin-right: 4vw;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+
+header a:hover {
+    text-decoration: underline;
+}
+
+/* 底部按钮 */
+footer a {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    color: white;
+    text-decoration: none;
+    border: 3px solid #ACACAC;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.5);
+    text-align: center;
+    z-index: 1000;
+}
+
+/* 👇 核心修改：背景图从导航栏下方开始，完整显示顶部 */
+/* 登录注册页面总容器 - 背景图覆盖全部空白区域 */
+.auth-page {
+    padding-top: 80px; /* 避开顶栏 */
+    min-height: 100vh; /* 覆盖整个视口 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 80px 20px 20px; /* 上下左右留白 */
+    background-image: url("../images/徽墨.jpg"); /* 直接复用主页背景图 */
+    background-size: cover;
+    background-position: center 25%; /* 从顶部往下10%开始显示，折中空白----------------关键调整*/
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* 背景固定，滚动不偏移 */
+}
+/* 登录注册容器（加边框，中间保持透明） */
+.auth-container {
+    width: 420px;
+    background-color: transparent; /* 中间依然透明 */
+    border: 2px solid rgba(255, 255, 255, 0.7); /* 白色半透明边框，不突兀 */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* 轻微阴影，增强边框立体感 */
+    position: relative;
+    z-index: 2;
+}
+
+/* 顶部红色头部（保持不变） */
+.auth-header {
+    background-color: #d94848;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 默认用户头像（保持不变） */
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: #d94848;
+}
+/* 图标兜底：如果没引入图标库，用背景色+文字也可 */
+.user-avatar::before {
+    content: "\f007"; /* 字体图标：用户 */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 600;
+}
+
+/* 登录/注册切换标签（透明背景，文字适配背景） */
+.auth-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* 浅白边框，不突兀 */
+    background-color: transparent; /* 彻底透明，无白色 */
+}
+.tab-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background-color: transparent;
+    font-size: 18px;
+    color: #fff; /* 文字改成白色，适配背景图 */
+    cursor: pointer;
+    font-weight: 700; /* 加粗登录/注册标签文字 */
+}
+.tab-btn.active {
+    color: #d94848;
+    border-bottom: 2px solid #d94848;
+    font-weight: 800; /* 激活态更粗，更醒目 */
+}
+
+/* 表单通用样式（透明背景，内容清晰） */
+.auth-form {
+    padding: 35px;
+    display: none;
+    background-color: transparent; /* 彻底透明，无白色 */
+}
+.auth-form.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5); /* 浅白边框，适配背景 */
+    border-radius: 6px;
+    font-size: 16px;
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明白色输入框，保证看清内容 */
+    color: #333; /* 输入文字颜色 */
+}
+.form-input:focus {
+    border-color: #d94848;
+    box-shadow: 0 0 0 2px rgba(217, 72, 72, 0.1);
+}
+
+/* 协议勾选区域（文字改成白色，适配背景） */
+.form-agreement {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    font-size: 14px;
+    color: #fff; /* 文字白色，适配背景图 */
+}
+.form-agreement input {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+}
+.agreement-link {
+    color: #d94848;
+    text-decoration: none;
+    font-weight: 700; /* 加粗免责声明文字 */
+}
+.agreement-link:hover {
+    text-decoration: underline;
+}
+
+/* 登录/注册按钮（保持不变） */
+.auth-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #d94848;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: 700; /* 加粗按钮内的登录/注册文字 */
+}
+.auth-btn:hover {
+    background-color: #c13e3e;
+}
+
+/* 切换提示文字（文字改成白色，适配背景） */
+.tab-tip {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #fff; /* 文字白色，适配背景图 */
+}
+.tab-tip a {
+    color: #d94848;
+    text-decoration: none;
+    font-weight: 700; /* 加粗去注册/去登录文字 */
+}
+.tab-tip a:hover {
+    text-decoration: underline;
+}

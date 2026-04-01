@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>卢小胖 AI 助手 - 智承皖遗</title>
+    <link rel="stylesheet" href="chat.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="../js/three-vrm.js"></script>
+    <script src="../shuziren/js/vrm-core.js"></script>
+</head>
+<body>
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="../index.html">首页</a></li>
+        <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="../women/women.html">关于我们</a></li>
+        <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+    <main class="chat-page">
+        <div class="chat-container">
+            <div class="chat-layout">
+                <!-- 左侧：对话列表 -->
+                <div class="chat-sidebar">
+                    <button class="new-chat-btn" id="newChatBtn">➕ 新建对话</button>
+                    <div class="history-list" id="historyList"></div>
+                </div>
+
+                <!-- 中间：聊天区 -->
+                <div class="chat-area">
+                    <div class="chat-title">
+                        <i class="fa-regular fa-comment-dots"></i>
+                        <span>与卢小胖聊天</span>
+                    </div>
+                    <div class="chat-history" id="chatHistory">
+                        <div class="message bot">
+                            <div class="avatar"><div class="robot-avatar">卢</div></div>
+                            <div class="text">嗨！我是卢小胖，来自合肥的数字人助手～你可以问我关于安徽非遗、合肥文化，或者随便聊聊天～</div>
+                        </div>
+                    </div>
+                    <div class="input-area">
+                        <textarea id="userInput" rows="1" placeholder="输入你想问的问题…"></textarea>
+                        <button id="sendBtn">发送 <i class="fa-regular fa-paper-plane"></i></button>
+                    </div>
+                    <div id="loadingMsg" class="loading-tip"><i class="fa-regular fa-hourglass-half"></i> 小胖思考中...</div>
+                </div>
+
+                <!-- 右侧数字人 -->
+                <div class="avatar-area">
+                    <div id="avatar-container"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+    <div class="greeting">
+        <i class="fa-regular fa-hand-peace"></i> 点击卢小胖，开始聊天吧～
+    </div>
+    
+    <div class="audio-tip" id="audioTip">🎵 点击页面任意位置，激活语音播放</div>
+
+    <script>
+        // ========== 登录状态 ==========
+        var currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            document.getElementById('user-link').innerHTML = '<a href="../profile.html">个人主页</a>';
+        } else {
+            document.getElementById('user-link').innerHTML = '<a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a>';
+        }
+
+        // ========== AI 配置 ==========
+        const API_KEY = 'sk-nzwqyvtfqrhqxygoipebslzmiuswnpyqhitccowjorxoaijw';
+        const API_URL = 'https://api.siliconflow.cn/v1/chat/completions';
+        const MODEL_NAME = 'deepseek-ai/DeepSeek-V3.2';
+
+        // DOM
+        const chatHistory = document.getElementById('chatHistory');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const loadingMsg = document.getElementById('loadingMsg');
+        const avatar = document.getElementById('avatar-container');
+        const newChatBtn = document.getElementById('newChatBtn');
+        const historyList = document.getElementById('historyList');
+        const audioTip = document.getElementById('audioTip');
+
+        // 状态
+        let currentChatId = null;
+        let chats = JSON.parse(localStorage.getItem('chats')) || [];
+        let isTyping = false;
+        let currentAudio = null;
+        let audioEnabled = false;
+        let pendingPlay = null;
+
+        // ========== 辅助函数：生成唯一空对话标题 ==========
+        function generateEmptyChatTitle() {
+            const emptyChats = chats.filter(chat => !chat.messages || chat.messages.length === 0);
+            let maxNum = 0;
+            emptyChats.forEach(chat => {
+                const match = chat.title.match(/^新对话(?:\s+(\d+))?$/);
+                if (match) {
+                    const num = match[1] ? parseInt(match[1]) : 1;
+                    if (num > maxNum) maxNum = num;
+                }
+            });
+            if (maxNum === 0) return '新对话';
+            return `新对话 ${maxNum + 1}`;
+        }
+
+        // ========== 辅助函数：从消息内容提取标题 ==========
+        function extractTitleFromMessage(content) {
+            let title = content.trim().slice(0, 15);
+            if (content.length > 15) title += '...';
+            return title;
+        }
+
+        // ========== 辅助函数：判断时间分组 ==========
+        function getTimeGroup(timestamp) {
+            const now = new Date();
+            const date = new Date(timestamp);
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const weekAgo = new Date(today);
+            weekAgo.setDate(today.getDate() - 7);
+
+            if (date >= today) return '今天';
+            if (date >= yesterday) return '昨天';
+            if (date >= weekAgo) return '7天内';
+            return '更早';
+        }
+
+        // ========== 聊天记录存储 ==========
+        function createNewChat() {
+            const chatId = 'chat_' + Date.now();
+            currentChatId = chatId;
+            const newTitle = generateEmptyChatTitle();
+            chats.unshift({
+                id: chatId,
+                title: newTitle,
+                messages: [],
+                updatedAt: Date.now()
+            });
+            saveChats();
+            renderHistory();
+            renderMessages();
+        }
+
+        function deleteChat(chatId, event) {
+            event.stopPropagation();
+            if (confirm('确定要删除这个对话吗？')) {
+                const chatIndex = chats.findIndex(c => c.id === chatId);
+                if (chatIndex !== -1) {
+                    chats.splice(chatIndex, 1);
+                    saveChats();
+                    if (chats.length === 0) {
+                        createNewChat();
+                    } else {
+                        if (currentChatId === chatId) {
+                            currentChatId = chats[0].id;
+                            renderMessages();
+                        }
+                        renderHistory();
+                    }
+                }
+            }
+        }
+
+        function saveChats() {
+            localStorage.setItem('chats', JSON.stringify(chats));
+        }
+
+        function addMessageToCurrentChat(role, content) {
+            const chat = chats.find(c => c.id === currentChatId);
+            if (chat) {
+                chat.messages.push({ role, content });
+                chat.updatedAt = Date.now();
+                
+                // 如果是用户的第一条消息且当前标题为“新对话”开头，则更新为消息摘要
+                if (role === 'user' && chat.messages.length === 1 && chat.title.startsWith('新对话')) {
+                    const newTitle = extractTitleFromMessage(content);
+                    chat.title = newTitle;
+                }
+                saveChats();
+                renderHistory();
+            }
+        }
+
+        // ========== 渲染历史记录（带分组和删除按钮） ==========
+        function renderHistory() {
+            if (!chats.length) return;
+            
+            const sortedChats = [...chats].sort((a, b) => b.updatedAt - a.updatedAt);
+            
+            const groups = {
+                '今天': [],
+                '昨天': [],
+                '7天内': [],
+                '更早': []
+            };
+            
+            sortedChats.forEach(chat => {
+                const group = getTimeGroup(chat.updatedAt);
+                groups[group].push(chat);
+            });
+            
+            historyList.innerHTML = '';
+            const groupOrder = ['今天', '昨天', '7天内', '更早'];
+            
+            groupOrder.forEach(groupName => {
+                const groupChats = groups[groupName];
+                if (groupChats.length === 0) return;
+                
+                const groupHeader = document.createElement('div');
+                groupHeader.className = 'history-group-header';
+                groupHeader.textContent = groupName;
+                historyList.appendChild(groupHeader);
+                
+                groupChats.forEach(chat => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item ' + (chat.id === currentChatId ? 'active' : '');
+                    
+                    const titleSpan = document.createElement('span');
+                    titleSpan.className = 'history-title';
+                    titleSpan.textContent = chat.title;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-chat-btn';
+                    deleteBtn.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
+                    deleteBtn.onclick = (e) => deleteChat(chat.id, e);
+                    
+                    div.appendChild(titleSpan);
+                    div.appendChild(deleteBtn);
+                    
+                    div.onclick = (e) => {
+                        if (e.target === deleteBtn || deleteBtn.contains(e.target)) return;
+                        currentChatId = chat.id;
+                        renderMessages();
+                        renderHistory();
+                    };
+                    historyList.appendChild(div);
+                });
+            });
+        }
+
+        // ========== 渲染消息 ==========
+        function renderMessages() {
+            const chat = chats.find(c => c.id === currentChatId);
+            chatHistory.innerHTML = `
+                <div class="message bot">
+                    <div class="avatar"><div class="robot-avatar">卢</div></div>
+                    <div class="text">嗨！我是卢小胖，来自合肥的数字人助手～你可以问我关于安徽非遗、合肥文化，或者随便聊聊天～</div>
+                </div>`;
+            if (chat && chat.messages) {
+                chat.messages.forEach(msg => addMessageToDOM(msg.role, msg.content, false));
+            }
+        }
+
+        // ========== 添加消息到DOM ==========
+        function addMessageToDOM(role, content, saveToStorage = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const userAvatar = getUserAvatar();
+            
+            let avatarHtml = '';
+            if (role === 'user') {
+                if (userAvatar) {
+                    avatarHtml = `<img src="${userAvatar}" alt="用户头像" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-regular fa-user\'></i>'">`;
+                } else {
+                    avatarHtml = '<i class="fa-regular fa-user"></i>';
+                }
+            } else {
+                avatarHtml = '<div class="robot-avatar">卢</div>';
+            }
+            
+            if (role === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="text">${escapeHtml(content)}</div>
+                    <div class="avatar">${avatarHtml}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="avatar">${avatarHtml}</div>
+                    <div class="text" id="text-${Date.now()}">${escapeHtml(content)}</div>
+                `;
+            }
+            
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            
+            if (saveToStorage && currentChatId) {
+                addMessageToCurrentChat(role, content);
+            }
+        }
+
+        // 带打字机效果的消息添加
+        async function addMessageWithTyping(role, fullContent) {
+            if (role === 'user') {
+                addMessageToDOM(role, fullContent, true);
+                return;
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            const avatarHtml = '<div class="robot-avatar">卢</div>';
+            
+            const textId = 'text-' + Date.now();
+            messageDiv.innerHTML = `
+                <div class="avatar">${avatarHtml}</div>
+                <div class="text" id="${textId}"></div>
+            `;
+            
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            
+            const textElement = document.getElementById(textId);
+            
+            await typeText(textElement, fullContent);
+            
+            console.log('AI回答完成，触发语音播放');
+            playVoice();
+            
+            if (currentChatId) {
+                addMessageToCurrentChat(role, fullContent);
+            }
+        }
+        
+        // 打字机效果函数
+        async function typeText(element, text) {
+            return new Promise((resolve) => {
+                let currentText = '';
+                const sentences = text.split(/([。！？；\n])/g);
+                let sentenceIndex = 0;
+                
+                function typeNextChar() {
+                    if (sentenceIndex < sentences.length) {
+                        let sentence = sentences[sentenceIndex];
+                        
+                        if (sentence === '。' || sentence === '！' || sentence === '？' || sentence === '；' || sentence === '\n') {
+                            currentText += sentence;
+                            element.innerHTML = currentText + '<span class="typing-cursor"></span>';
+                            sentenceIndex++;
+                            setTimeout(typeNextChar, 300);
+                        } else if (sentence) {
+                            let charIndex = 0;
+                            function typeChar() {
+                                if (charIndex < sentence.length) {
+                                    currentText += sentence[charIndex];
+                                    element.innerHTML = currentText + '<span class="typing-cursor"></span>';
+                                    charIndex++;
+                                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                                    const delay = Math.random() * 50 + 30;
+                                    setTimeout(typeChar, delay);
+                                } else {
+                                    sentenceIndex++;
+                                    setTimeout(typeNextChar, 50);
+                                }
+                            }
+                            typeChar();
+                        } else {
+                            sentenceIndex++;
+                            setTimeout(typeNextChar, 50);
+                        }
+                    } else {
+                        element.innerHTML = currentText;
+                        resolve();
+                    }
+                }
+                
+                typeNextChar();
+            });
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function addMessage(role, content) {
+            if (role === 'user') {
+                addMessageToDOM(role, content, true);
+            } else {
+                addMessageWithTyping(role, content);
+            }
+        }
+
+        async function callDeepSeek(userMessage) {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: MODEL_NAME,
+                    messages: [
+                        { 
+                            role: "system", 
+                            content: "你是卢小胖，一个活泼可爱的数字人助手，生活在合肥。你的性格幽默风趣，喜欢用生动的语言介绍安徽非遗文化、合肥历史和美食。回答要口语化，简短亲切，偶尔加些 emoji 增加趣味。回答时注意分段，让阅读更舒适。" 
+                        },
+                        { role: "user", content: userMessage }
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 1024,
+                    stream: false
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API 错误 ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot typing-message';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="avatar"><div class="robot-avatar">卢</div></div>
+                <div class="text">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            chatHistory.appendChild(typingDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+        
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        async function sendMessage() {
+            if (isTyping) return;
+            
+            const msg = userInput.value.trim();
+            if (!msg) return;
+            if (!currentChatId) createNewChat();
+
+            addMessage('user', msg);
+            userInput.value = '';
+
+            sendBtn.disabled = true;
+            showTypingIndicator();
+
+            try {
+                const reply = await callDeepSeek(msg);
+                hideTypingIndicator();
+                await addMessage('bot', reply);
+            } catch (error) {
+                console.error(error);
+                hideTypingIndicator();
+                await addMessage('bot', '哎呀，网络开小差了，稍后再找我聊天吧～');
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        // ========== 获取用户头像 ==========
+        function getUserAvatar() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) return null;
+
+            let userAvatar = localStorage.getItem(`avatar_${currentUser}`);
+
+            if (!userAvatar || userAvatar === 'null' || userAvatar === '') {
+                try {
+                    const userData = localStorage.getItem('userData');
+                    if (userData) {
+                        const data = JSON.parse(userData);
+                        userAvatar = data.avatar || data.profileImage || null;
+                    }
+                } catch (e) {
+                    console.error('解析 userData 失败', e);
+                }
+            }
+
+            if (!userAvatar || userAvatar === 'null' || userAvatar === '') {
+                try {
+                    const profileData = localStorage.getItem('profileData');
+                    if (profileData) {
+                        const data = JSON.parse(profileData);
+                        userAvatar = data.avatar || data.profileImage || null;
+                    }
+                } catch (e) {
+                    console.error('解析 profileData 失败', e);
+                }
+            }
+
+            return (userAvatar && userAvatar !== 'null' && userAvatar !== '') ? userAvatar : null;
+        }
+
+        // ========== 语音播放功能 ==========
+        const VOICE_MP3_PATH = '../shuziren/audio/shuziren.mp3';
+        
+        function playVoice() {
+            if (!audioEnabled) {
+                console.log('音频未激活，等待用户交互');
+                return false;
+            }
+            
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            
+            currentAudio = new Audio(VOICE_MP3_PATH);
+            currentAudio.volume = 1.0;
+            
+            currentAudio.play().then(() => {
+                console.log('✅ 音频播放成功');
+            }).catch(error => {
+                console.error('❌ 音频播放失败:', error);
+                if (error.name === 'NotAllowedError') {
+                    audioEnabled = false;
+                    showAudioTip();
+                }
+            });
+            
+            currentAudio.onended = () => {
+                console.log('音频播放结束');
+                currentAudio = null;
+                if (pendingPlay) {
+                    const callback = pendingPlay;
+                    pendingPlay = null;
+                    callback();
+                }
+            };
+            
+            currentAudio.onerror = (error) => {
+                console.error('音频加载失败:', error);
+                console.log('请检查音频文件路径是否正确: ' + VOICE_MP3_PATH);
+            };
+            
+            return true;
+        }
+        
+        function showAudioTip() {
+            audioTip.classList.add('show');
+            setTimeout(() => {
+                audioTip.classList.remove('show');
+            }, 3000);
+        }
+        
+        function enableAudio() {
+            if (audioEnabled) return;
+            audioEnabled = true;
+            console.log('🔊 音频已激活');
+            showAudioTip();
+            
+            const testAudio = new Audio();
+            testAudio.volume = 0;
+            testAudio.play().then(() => {
+                testAudio.pause();
+                console.log('音频权限已获取');
+            }).catch(() => {});
+            
+            setTimeout(() => {
+                console.log('播放欢迎语音');
+                playVoice();
+            }, 500);
+        }
+        
+        function playWelcomeVoice() {
+            if (audioEnabled) {
+                console.log('播放欢迎语音');
+                playVoice();
+            } else {
+                console.log('等待音频激活后播放欢迎语音');
+                pendingPlay = () => {
+                    playVoice();
+                };
+            }
+        }
+
+        // ========== 初始化 ==========
+        window.onload = () => {
+            if (chats.length === 0) {
+                createNewChat();
+            } else {
+                let needSave = false;
+                chats.forEach(chat => {
+                    if (!chat.updatedAt) {
+                        chat.updatedAt = Date.now();
+                        needSave = true;
+                    }
+                });
+                if (needSave) saveChats();
+                
+                currentChatId = chats[0].id;
+                renderMessages();
+            }
+            renderHistory();
+            
+            const userAvatar = getUserAvatar();
+            if (userAvatar) {
+                console.log('✅ 成功获取用户头像');
+            } else {
+                console.log('⚠️ 未找到用户头像，使用默认图标');
+            }
+            
+            console.log('准备播放欢迎语音，音频文件路径: ' + VOICE_MP3_PATH);
+            
+            const activateAudio = () => {
+                enableAudio();
+                document.removeEventListener('click', activateAudio);
+                document.removeEventListener('touchstart', activateAudio);
+            };
+            
+            document.addEventListener('click', activateAudio);
+            document.addEventListener('touchstart', activateAudio);
+            
+            setTimeout(() => {
+                if (!audioEnabled) {
+                    showAudioTip();
+                }
+            }, 500);
+        };
+
+        newChatBtn.onclick = createNewChat;
+        sendBtn.onclick = sendMessage;
+        userInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // ========== 数字人逻辑 ==========
+        let isAvatarReady = false;
+        let hasSpokenGreeting = false;
+
+        function waitForAvatar() {
+            return new Promise(resolve => {
+                const check = setInterval(() => {
+                    if (avatar && avatar.querySelector('canvas')) {
+                        clearInterval(check);
+                        isAvatarReady = true;
+                        console.log('数字人模型已加载');
+                        resolve();
+                    }
+                }, 300);
+                setTimeout(() => { 
+                    clearInterval(check); 
+                    console.log('数字人加载超时');
+                    resolve(); 
+                }, 15000);
+            });
+        }
+
+        waitForAvatar().then(() => {
+            if (!hasSpokenGreeting) {
+                hasSpokenGreeting = true;
+                setTimeout(() => {
+                    console.log('卢小胖已就绪');
+                }, 1500);
+            }
+        });
+
+        avatar.addEventListener('click', () => userInput.focus());
+        
+        window.addEventListener('beforeunload', () => {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+        });
+    </script>
+</body>
+</html>

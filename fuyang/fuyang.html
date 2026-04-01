@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智承皖遗 - 阜阳市非遗文化</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/jquery.maphilight.min.js"></script>
+    <script src="../js/auth.js"></script>
+    <!-- 卢小胖3D依赖 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="../js/three-vrm.js"></script>   
+    <!-- 数字人模块 -->
+    <script src="../shuziren/js/vrm-core.js"></script>
+    <script src="../shuziren/js/introduce.js"></script>
+     <!-- ========== 新增：引入通用浏览历史函数文件 ========== -->
+    <script src="../js/common.js"></script>
+</head>
+<body>
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="../index.html">首页</a></li>
+        <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="../women/women.html">关于我们</a></li>
+        <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+    <main>
+        <section class="hero-section">
+            <img src="../images/阜阳风光.jpg" alt="阜阳风光" class="hero-img">
+            <div class="hero-overlay">
+                <h1>阜阳非遗 · 皖北水乡</h1>
+            </div>
+        </section>
+
+        <section class="intro-section">
+            <div class="container">
+                <div class="intro-row">
+                    <div class="intro-img">
+                        <img src="../images/阜阳非遗场景.png" alt="阜阳非遗场景">
+                    </div>
+                    <div class="intro-text">
+                        <h2>阜阳市非遗介绍</h2>
+                        <h3>什么是阜阳非遗？</h3>
+                        <p>阜阳位于安徽省西北部，是淮河文化的重要发源地之一。这里不仅有颍州西湖的秀美风光，更有丰富的非物质文化遗产。嗨子戏、淮河琴书、阜阳剪纸、太和狮子灯等非遗项目，展现了阜阳人民千百年来在淮北平原上创造的灿烂文化。</p>
+                        <p>阜阳非遗融合了中原文化的厚重与淮河文化的灵动，既有北方文化的豪迈，又有南方文化的细腻。从管仲故里的历史传说到界首苗湖书会的民间曲艺，阜阳非遗是淮河文化的重要代表，承载着这座城市的历史记忆与文化基因。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="heritage-slider-section">
+            <div class="container">
+                <h2 class="section-title">阜阳非遗精粹</h2>
+                <div class="heritage-category-list" id="heritageCategoryList"></div>
+                <div id="avatar-container" style="position: absolute; top: 50%; right: 80px; transform: translateY(-50%); width: 220px; height: 330px; z-index: 20; cursor: pointer; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: rgba(0,0,0,0.1);">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+    <script src="../js/data.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.map-img').maphilight({
+                fill: true,
+                fillColor: 'ffcc00',
+                fillOpacity: 0.5,
+                stroke: true,
+                strokeColor: 'ffffff',
+                strokeWidth: 2,
+                fade: true
+            });
+            $('canvas').css('pointer-events', 'none');
+        });
+  // ========== 核心新增：通用浏览记录函数 ==========
+        function addBrowseHistory(name) {
+            // 1. 构造蚌埠非遗详情页的完整路径（从profile.html出发）
+            const fullPath = `../detail/detail.html?name=${encodeURIComponent(name)}`;
+            // 2. 读取已有浏览记录
+            let browseHistory = JSON.parse(localStorage.getItem('browseHistory')) || [];
+            // 3. 去重：删除同名旧记录，避免重复
+            browseHistory = browseHistory.filter(item => item.name !== name);
+            // 4. 添加新记录（最新的在最前面）
+            browseHistory.unshift({
+                name: name,
+                time: new Date().toLocaleString('zh-CN', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                }), // 格式化时间，显示更规范
+                path: fullPath // 关键：存储带参数的真实跳转路径
+            });
+            // 5. 限制最多存储20条记录，防止数据冗余
+            browseHistory = browseHistory.slice(0, 20);
+            // 6. 保存回本地存储
+            localStorage.setItem('browseHistory', JSON.stringify(browseHistory));
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('heritageCategoryList');
+            
+            // 阜阳非遗图片映射（严格按照 data.js 中的名称）
+            const imageMap = {
+                // 传统戏剧
+                "嗨子戏": "../images/嗨子戏.jpg",
+                "推剧": "../images/推剧.jpg",
+                "淮北梆子戏": "../images/淮北梆子戏.jpg",
+                "扁担戏": "../images/扁担戏.jpg",
+                
+                // 曲艺
+                "清音": "../images/清音.jpg",
+                "渔鼓": "../images/渔鼓.jpg",
+                "淮河琴书": "../images/淮河琴书.jpg",
+                
+                // 传统音乐
+                "淮河锣鼓": "../images/淮河锣鼓.jpg",
+                
+                // 传统舞蹈
+                "太和狮子灯": "../images/太和狮子灯.jpg",
+                
+                // 传统体育、游艺与杂技
+                "民间杂技马戏": "../images/民间杂技马戏.jpg",
+                "鲖城火叉、火鞭": "../images/鲖城火叉、火鞭.jpg",
+                "肘歌抬歌": "../images/肘歌抬歌.jpg",
+                
+                // 传统美术
+                "民间剪纸": "../images/民间剪纸.jpg",
+
+                
+                // 传统技艺
+                "淮河柳编工艺\n（黄岗柳编、霍邱柳编）": "../images/淮河柳编工艺.jpg",
+                "临泉毛笔制作技艺": "../images/临泉毛笔制作技艺.jpg",
+                "颍州枕头馍制作技艺": "../images/颍州枕头馍制作技艺.jpg",
+                "杜氏刻铜技艺": "../images/杜氏刻铜技艺.jpg",
+                "阜阳刺绣\n（细阳刺绣、界首刺绣）": "../images/阜阳刺绣.jpg",                
+                
+                // 传统医药
+                "武氏手诊手疗医术": "../images/武氏手诊手疗医术.jpg",
+                
+                // 民俗
+                "界首苗湖书会": "../images/界首苗湖书会.jpg",
+                "大黄庙会": "../images/大黄庙会.jpg",
+                "抬阁（肘阁、湖村抬阁、隆阜抬阁）": "../images/抬阁.jpg",
+                
+                // 民间文学
+                "管仲的传说": "../images/管仲的传说.jpg"
+            };
+
+            if (!Array.isArray(intangibleData)) {
+                container.innerHTML = '<p class="category-empty">数据加载失败，请稍后重试。</p>';
+                return;
+            }
+
+            // 筛选阜阳市的所有非遗项目（包含跨市项目，只要area包含阜阳）
+            const fuyangItems = intangibleData.filter(item =>
+                item && typeof item.area === 'string' && 
+                item.area.includes('阜阳')
+            );
+            
+            // 去重
+            const uniqueFuyangItems = fuyangItems.filter((item, index, arr) => {
+                const name = (item.name || '').trim();
+                return arr.findIndex(v => (v.name || '').trim() === name) === index;
+            });
+
+            // 按分类分组
+            const grouped = uniqueFuyangItems.reduce((acc, item) => {
+                const key = item.category || '其他';
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(item);
+                return acc;
+            }, {});
+
+            const categories = Object.keys(grouped);
+            if (!categories.length) {
+                container.innerHTML = '<p class="category-empty">暂无阜阳市非遗数据。</p>';
+                return;
+            }
+
+            // 生成所有分类的 HTML
+            categories.forEach((category, index) => {
+                const rowId = 'categorySlider' + index;
+                const items = grouped[category];
+                const cardsHtml = items.map(item => {
+                    const image = imageMap[item.name] || '';
+                    const safeArea = (item.area || '').replace(/\n/g, ' / ');
+                    const safeUnit = item.protectUnit || '未登记';
+                    const imageHtml = image
+                        ? `<img src="${image}" alt="${item.name}" loading="lazy">`
+                        : `<div class="img-fallback">阜阳非遗 · ${category}</div>`;
+                    return `
+                        <div class="heritage-card" data-name="${item.name.replace(/"/g, '&quot;')}">
+                            ${imageHtml}
+                            <h4>${item.name}</h4>
+                            <p>${category}</p>
+                            <div class="meta">地区：${safeArea}<br>保护单位：${safeUnit}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                const rowHtml = `
+                    <div class="heritage-category">
+                        <div class="category-header">
+                            <h3 class="category-title">${category}</h3>
+                            <div class="category-actions">
+                                <span class="category-count">${items.length} 项</span>
+                                <button class="slider-btn row-prev" data-row="${rowId}" aria-label="向左滑动"><i class="fa-solid fa-chevron-left"></i></button>
+                                <button class="slider-btn row-next" data-row="${rowId}" aria-label="向右滑动"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="category-slider-wrapper">
+                            <div class="category-slider" id="${rowId}">
+                                ${cardsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', rowHtml);
+            });
+
+            // 全局事件监听（只绑定一次）
+            container.addEventListener('click', function(event) {
+                const prev = event.target.closest('.row-prev');
+                const next = event.target.closest('.row-next');
+                const card = event.target.closest('.heritage-card');
+
+                if (prev || next) {
+                    const btn = prev || next;
+                    const rowId = btn.getAttribute('data-row');
+                    const row = document.getElementById(rowId);
+                    if (row) {
+                        row.scrollBy({ left: prev ? -320 : 320, behavior: 'smooth' });
+                    }
+                    return;
+                }
+
+                if (card) {
+                    const name = card.getAttribute('data-name');
+                    if (name) {  
+                         // ========== 新增：调用通用函数记录浏览历史 ==========
+                        addBrowseHistory(decodeURIComponent(name));
+                        window.location.href = `../detail/detail.html?name=${encodeURIComponent(name)}`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

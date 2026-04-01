@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智承皖遗 - 蚌埠市非遗文化</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/jquery.maphilight.min.js"></script>
+    <script src="../js/auth.js"></script>
+    <!-- 卢小胖3D依赖 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="../js/three-vrm.js"></script>   
+    <!-- 数字人模块 -->
+    <script src="../shuziren/js/vrm-core.js"></script>
+    <script src="../shuziren/js/introduce.js"></script>
+    <!-- ========== 新增：引入通用浏览历史函数文件 ========== -->
+    <script src="../js/common.js"></script>
+</head>
+<body>
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="../index.html">首页</a></li>
+        <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="../women/women.html">关于我们</a></li>
+        <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+    <main>
+        <section class="hero-section">
+            <!-- 修复：图片路径保持不变，标题修正为蚌埠 -->
+            <img src="../images/蚌埠风光.jpg" alt="蚌埠风光" class="hero-img">
+            <div class="hero-overlay">
+                <h1>蚌埠非遗 · 皖韵千年</h1>
+            </div>
+        </section>
+
+        <section class="intro-section">
+            <div class="container">
+                <div class="intro-row">
+                    <div class="intro-img">
+                        <img src="../images/蚌埠非遗.jpg" alt="蚌埠非遗场景">
+                    </div>
+                    <div class="intro-text">
+                        <h2>蚌埠市非遗介绍</h2>
+                        <h3>什么是蚌埠非遗？</h3>
+                        <p>蚌埠是淮河文化的核心发源地，孕育了丰富的非物质文化遗产。这里有五河民歌、卫调花鼓等传统音乐，也有临北狮子舞、独杆轿等传统舞蹈，更有涂山禹王庙会、清明庙会等民俗文化，以及石良道膏药等传统医药技艺。</p>
+                        <p>蚌埠非遗根植于淮河流域的水土，承载着淮河儿女的记忆与智慧，多项非遗先后入选国家级、省级非遗名录，是淮河文化的璀璨瑰宝。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="heritage-slider-section">
+            <div class="container">
+                <h2 class="section-title">蚌埠非遗精粹</h2>
+                <div class="heritage-category-list" id="heritageCategoryList"></div>
+                <div id="avatar-container" style="position: absolute; top: 50%; right: 80px; transform: translateY(-50%); width: 220px; height: 330px; z-index: 20; cursor: pointer; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); background: rgba(0,0,0,0.1);">
+                </div>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+    <script src="../js/data.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.map-img').maphilight({
+                fill: true,
+                fillColor: 'ffcc00',
+                fillOpacity: 0.5,
+                stroke: true,
+                strokeColor: 'ffffff',
+                strokeWidth: 2,
+                fade: true
+            });
+            $('canvas').css('pointer-events', 'none');
+        });
+
+        // ========== 核心新增：通用浏览记录函数 ==========
+        function addBrowseHistory(name) {
+            // 1. 构造蚌埠非遗详情页的完整路径（从profile.html出发）
+            const fullPath = `../detail/detail.html?name=${encodeURIComponent(name)}`;
+            // 2. 读取已有浏览记录
+            let browseHistory = JSON.parse(localStorage.getItem('browseHistory')) || [];
+            // 3. 去重：删除同名旧记录，避免重复
+            browseHistory = browseHistory.filter(item => item.name !== name);
+            // 4. 添加新记录（最新的在最前面）
+            browseHistory.unshift({
+                name: name,
+                time: new Date().toLocaleString('zh-CN', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                }), // 格式化时间，显示更规范
+                path: fullPath // 关键：存储带参数的真实跳转路径
+            });
+            // 5. 限制最多存储20条记录，防止数据冗余
+            browseHistory = browseHistory.slice(0, 20);
+            // 6. 保存回本地存储
+            localStorage.setItem('browseHistory', JSON.stringify(browseHistory));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('heritageCategoryList');
+            // 图片映射 - 完全匹配你截图里的 bengbu/images/ 目录
+            const imageMap = {
+                "独杆轿": "../images/独杆轿.jpg",
+                "端公腔": "../images/端公腔.jpg",
+                "垓下民间传说": "../images/垓下民间传说.jpg",
+                "旱船舞": "../images/旱船舞.jpg",
+                "淮河琴书": "../images/淮河琴书.jpg",
+                "临北狮子舞": "../images/临北狮子舞.jpg",
+                "钱杆舞": "../images/钱杆舞.jpg",
+                "清明庙会": "../images/清明庙会.jpg",
+                "石良道膏药": "../images/石良道膏药.jpg",
+                "涂山大禹传说": "../images/涂山大禹传说.jpg",
+                "涂山禹王庙会": "../images/涂山禹王庙会.jpg",
+                "卫调花鼓": "../images/卫调花鼓.jpg",
+                "五河民歌": "../images/五河民歌.jpg",
+                "杨氏微雕": "../images/杨氏微雕.jpg",
+                "余家皮影戏": "../images/余家皮影戏.jpg"
+            };
+
+            if (!Array.isArray(intangibleData)) {
+                container.innerHTML = '<p class="category-empty">数据加载失败，请稍后重试。</p>';
+                return;
+            }
+
+            // 筛选蚌埠非遗数据
+            const bengbuItems = intangibleData.filter(item =>
+                item && typeof item.area === 'string' && item.area.includes('蚌埠市')
+            );
+            const uniqueBengbuItems = bengbuItems.filter((item, index, arr) => {
+                const name = (item.name || '').trim();
+                return arr.findIndex(v => (v.name || '').trim() === name) === index;
+            });
+
+            const grouped = uniqueBengbuItems.reduce((acc, item) => {
+                const key = item.category || '其他';
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(item);
+                return acc;
+            }, {});
+
+            const categories = Object.keys(grouped);
+            if (!categories.length) {
+                container.innerHTML = '<p class="category-empty">暂无蚌埠市非遗数据。</p>';
+                return;
+            }
+
+            // 生成所有分类的 HTML
+            categories.forEach((category, index) => {
+                const rowId = 'categorySlider' + index;
+                const items = grouped[category];
+                const cardsHtml = items.map(item => {
+                    const image = imageMap[item.name] || '';
+                    const safeArea = (item.area || '').replace(/\n/g, ' / ');
+                    const safeUnit = item.protectUnit || '未登记';
+                    const imageHtml = image
+                        ? `<img src="${image}" alt="${item.name}" loading="lazy">`
+                        : `<div class="img-fallback">蚌埠非遗 · ${category}</div>`;
+                    return `
+                        <div class="heritage-card" data-name="${item.name.replace(/"/g, '&quot;')}">
+                            ${imageHtml}
+                            <h4>${item.name}</h4>
+                            <p>${category}</p>
+                            <div class="meta">地区：${safeArea}<br>保护单位：${safeUnit}</div>
+                        </div>
+                    `;
+                }).join('');
+
+                const rowHtml = `
+                    <div class="heritage-category">
+                        <div class="category-header">
+                            <h3 class="category-title">${category}</h3>
+                            <div class="category-actions">
+                                <span class="category-count">${items.length} 项</span>
+                                <button class="slider-btn row-prev" data-row="${rowId}" aria-label="向左滑动"><i class="fa-solid fa-chevron-left"></i></button>
+                                <button class="slider-btn row-next" data-row="${rowId}" aria-label="向右滑动"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="category-slider-wrapper">
+                            <div class="category-slider" id="${rowId}">
+                                ${cardsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', rowHtml);
+            });
+
+            // 全局事件监听（只绑定一次）
+            container.addEventListener('click', function(event) {
+                const prev = event.target.closest('.row-prev');
+                const next = event.target.closest('.row-next');
+                const card = event.target.closest('.heritage-card');
+
+                if (prev || next) {
+                    const btn = prev || next;
+                    const rowId = btn.getAttribute('data-row');
+                    const row = document.getElementById(rowId);
+                    if (row) {
+                        row.scrollBy({ left: prev ? -320 : 320, behavior: 'smooth' });
+                    }
+                    return;
+                }
+
+                if (card) {
+                    const name = card.getAttribute('data-name');
+                    if (name) {
+                        // ========== 调用浏览记录函数 ==========
+                        addBrowseHistory(decodeURIComponent(name));
+                        // 跳转到详情页（带名称参数）
+                        window.location.href = `../detail/detail.html?name=${encodeURIComponent(name)}`;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

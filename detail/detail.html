@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智承皖遗 - 非遗详情</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="../index.html">首页</a></li>
+        <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="../women/women.html">关于我们</a></li>
+        <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+    <main>
+        <div class="detail-container" id="detailContainer">
+            <div class="loading"><i class="fas fa-spinner fa-pulse"></i> 加载中...</div>
+        </div>
+    </main>
+
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+    <script src="../js/data.js"></script>
+    <script>
+        // ========== 导航栏状态同步（检查登录状态） ==========
+        var currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            document.getElementById('user-link').innerHTML = '<a href="../profile.html">个人主页</a>';
+        } else {
+            document.getElementById('user-link').innerHTML = '<a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a>';
+        }
+
+        // 获取 URL 参数
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // 查找非遗项目
+        function findHeritageByName(rawName) {
+            if (!intangibleData || !Array.isArray(intangibleData)) {
+                console.error('❌ data.js 未加载或格式错误');
+                return null;
+            }
+            let decodedName = decodeURIComponent(rawName).trim();
+            console.log('🔍 查找非遗名称:', decodedName);
+            console.log('📚 data.js 中共有', intangibleData.length, '条记录');
+            let found = intangibleData.find(item => item.name === decodedName);
+            if (found) {
+                console.log('✅ 精确匹配成功:', found.name);
+                return found;
+            }
+            const huangshanNames = intangibleData
+                .filter(item => item.area && item.area.includes('黄山市'))
+                .map(item => item.name);
+            console.log('📋 黄山市非遗名称列表:', huangshanNames);
+            return null;
+        }
+
+        // 处理图片路径
+        function fixImagePath(path) {
+            if (!path) return '../images/placeholder.jpg';
+            if (path.startsWith('images/')) {
+                return '../' + path;
+            }
+            return path;
+        }
+
+        /**
+         * 将描述文本按空行分割成模块，每个模块第一行为标题，后续为内容段落。
+         * 返回 HTML 字符串，包含多个 .detail-section 块。
+         */
+        function formatDescription(desc) {
+            if (!desc || !desc.trim()) {
+                return '<div class="detail-section"><p>暂无详细描述，资料正在整理中，敬请期待。</p></div>';
+            }
+            // 按空行分割模块（空行由一个或多个换行符组成）
+            const sections = desc.split(/\n\s*\n/).filter(s => s.trim() !== '');
+            return sections.map(section => {
+                const lines = section.split(/\r?\n/).filter(l => l.trim() !== '');
+                if (lines.length === 0) return '';
+                // 第一行作为模块标题
+                const title = lines[0].trim();
+                // 剩余行作为内容段落（去除每行开头的\t或空格，保留文本）
+                const contentLines = lines.slice(1).map(line => line.replace(/^\s+/, ''));
+                return `
+                    <div class="detail-section">
+                        <h3 class="detail-section-title">
+                            <i class="fas fa-scroll"></i> ${title}
+                        </h3>
+                        ${contentLines.map(line => `<p>${line}</p>`).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 渲染详情页
+        function renderDetail(heritage, rawName) {
+            const container = document.getElementById('detailContainer');
+            if (!heritage) {
+                const decodedName = rawName ? decodeURIComponent(rawName) : '未知';
+                let allNames = [];
+                if (intangibleData && Array.isArray(intangibleData)) {
+                    allNames = intangibleData
+                        .filter(item => item.area && item.area.includes('黄山市'))
+                        .map(item => item.name);
+                }
+                const nameListHtml = allNames.length ? 
+                    `<div style="text-align:left; max-width:600px; margin:20px auto;">
+                        <strong>现有黄山市非遗名称：</strong><br>
+                        ${allNames.map(n => `「${n}」`).join('、')}
+                    </div>` : 
+                    '<div>未找到黄山市非遗数据，请检查 data.js 中 area 字段是否包含“黄山市”。</div>';
+
+                container.innerHTML = `
+                    <div class="error">
+                        <h2>未找到该非遗项目</h2>
+                        <p>您访问的项目名称：<strong>${decodedName}</strong></p>
+                        <p>请检查名称是否与 data.js 中完全一致（包括标点符号、括号、空格）。</p>
+                        ${nameListHtml}
+                        <p><a href="../index.html" class="back-link">返回首页</a></p>
+                        <p><small>提示：可打开浏览器控制台（F12）查看详细匹配日志。</small></p>
+                    </div>
+                `;
+                return;
+            }
+
+            document.title = `${heritage.name} - 智承皖遗`;
+
+            let mainImage = '';
+            if (heritage.mainImage) {
+                mainImage = fixImagePath(heritage.mainImage);
+            } else if (heritage.images && heritage.images.length > 0) {
+                mainImage = fixImagePath(heritage.images[0]);
+            } else {
+                mainImage = '../images/placeholder.jpg';
+            }
+
+            // 使用 formatDescription 生成模块化描述
+            const descriptionHtml = formatDescription(heritage.description);
+
+            // 如果数据中有额外的传承人、历史等独立字段，可作为补充信息展示（可选）
+            let extraHtml = '';
+            if (heritage.inheritor) extraHtml += `<p><strong>代表性传承人：</strong> ${heritage.inheritor}</p>`;
+            if (heritage.history) extraHtml += `<p><strong>历史渊源：</strong> ${heritage.history}</p>`;
+            if (heritage.features) extraHtml += `<p><strong>艺术特色：</strong> ${heritage.features}</p>`;
+            const extraBlock = extraHtml ? `<div class="detail-info">${extraHtml}</div>` : '';
+
+            const html = `
+                <div class="detail-header">
+                    <h1>${heritage.name}</h1>
+                    <div class="detail-meta">
+                        <span><i class="fas fa-tag"></i> ${heritage.category || '传统技艺'}</span>
+                        <span><i class="fas fa-map-marker-alt"></i> ${heritage.area || '安徽省'}</span>
+                        <span><i class="fas fa-building"></i> ${heritage.protectUnit || '未登记'}</span>
+                    </div>
+                </div>
+                <div class="detail-main-image">
+                    <img src="${mainImage}" alt="${heritage.name}" onerror="this.src='../images/placeholder.jpg'">
+                </div>
+                <div class="detail-description">
+                    ${descriptionHtml}
+                </div>
+                ${extraBlock}
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="javascript:history.back()" class="back-link"><i class="fas fa-arrow-left"></i> 返回上一页</a>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const nameParam = getQueryParam('name');
+            if (nameParam) {
+                const heritage = findHeritageByName(nameParam);
+                renderDetail(heritage, nameParam);
+            } else {
+                document.getElementById('detailContainer').innerHTML = `
+                    <div class="error">
+                        <h2>无效的访问链接</h2>
+                        <p>未提供非遗项目名称。</p>
+                        <a href="../index.html" class="back-link">返回首页</a>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

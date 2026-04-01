@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智承皖遗 - 安徽省非遗文化数字化网</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/jquery.maphilight.min.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/data.js"></script>
+    <style>
+        #clear-search-state {
+            margin-left: 10px;
+            padding: 0 24px;
+            height: 44px;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            background-color: #d92121;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #clear-search-state:hover {
+            background-color: #b81c1c;
+        }
+        .search-box button {
+            padding: 0 24px;
+            height: 44px;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            background-color: #d92121;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .search-box button:hover {
+            background-color: #b81c1c;
+        }
+        .search-box input {
+            height: 44px;
+            padding: 0 12px;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            font-size: 14px;
+        }
+        /* 筛选提示条 */
+        #filter-tip {
+            margin: 10px 0;
+            padding: 5px 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            display: none;
+        }
+        #reset-tag-filter {
+            margin-left: 10px;
+            padding: 2px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="../index.html">首页</a></li>
+        <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="../women/women.html">关于我们</a></li>
+        <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+    <main class="search-main">
+        <section class="search-filter">
+            <div class="filter-item">
+                <label>所属地区：</label>
+                <select name="area">
+                    <option value="">全部</option>
+                    <option value="合肥市">合肥市</option>
+                    <option value="芜湖市">芜湖市</option>
+                    <option value="蚌埠市">蚌埠市</option>
+                    <option value="淮南市">淮南市</option>
+                    <option value="马鞍山市">马鞍山市</option>
+                    <option value="淮北市">淮北市</option>
+                    <option value="铜陵市">铜陵市</option>
+                    <option value="安庆市">安庆市</option>
+                    <option value="黄山市">黄山市</option>
+                    <option value="滁州市">滁州市</option>
+                    <option value="阜阳市">阜阳市</option>
+                    <option value="宿州市">宿州市</option>
+                    <option value="六安市">六安市</option>
+                    <option value="亳州市">亳州市</option>
+                    <option value="池州市">池州市</option>
+                    <option value="宣城市">宣城市</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>非遗类别：</label>
+                <select name="category">
+                    <option value="">全部</option>
+                    <option value="民间文学">民间文学</option>
+                    <option value="传统音乐">传统音乐</option>
+                    <option value="传统舞蹈">传统舞蹈</option>
+                    <option value="传统戏剧">传统戏剧</option>
+                    <option value="曲艺">曲艺</option>
+                    <option value="传统体育、游艺与杂技">传统体育、游艺与杂技</option>
+                    <option value="传统美术">传统美术</option>
+                    <option value="传统技艺">传统技艺</option>
+                    <option value="传统医药">传统医药</option>
+                    <option value="民俗">民俗</option>
+                </select>
+            </div>
+            <div class="filter-item search-box">
+                <input type="text" placeholder="请输入非遗名称/关键词检索">
+                <button id="search-btn">检索</button>
+                <button id="clear-search-state">清除搜索状态</button>
+            </div>
+        </section>
+
+        <section class="filter-tip" id="filter-tip">
+            <span id="filter-tip-text"></span>
+            <button id="reset-tag-filter">显示全部</button>
+        </section>
+
+        <section class="heritage-table-wrap">
+            <table class="heritage-table">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>非遗名称</th>
+                        <th>类别</th>
+                        <th>申报地区/单位</th>
+                        <th>保护单位</th>
+                    </tr>
+                </thead>
+                <tbody id="heritage-tbody">
+                </tbody>
+            </table>
+        </section>
+
+        <section class="pagination-wrap">
+            <div class="pagination" id="pagination"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+    <script>
+$(document).ready(function() {
+    let currentPage = 1;
+    const pageSize = 10;
+    let currentFilteredData = [];
+    let baseData = [];
+
+    // 获取当前时间
+    function getCurrentTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    // 添加浏览记录
+    function addBrowseRecord(itemName) {
+        if (!itemName) return;
+        let browseHistory = JSON.parse(localStorage.getItem('browseHistory')) || [];
+        const currentTime = getCurrentTime();
+        const detailPath = getHeritageDetailPath(itemName);
+        const existingIndex = browseHistory.findIndex(record => record.name === itemName);
+        if (existingIndex !== -1) {
+            browseHistory.splice(existingIndex, 1);
+        }
+        browseHistory.unshift({
+            name: itemName,
+            time: currentTime,
+            path: detailPath
+        });
+        if (browseHistory.length > 30) {
+            browseHistory = browseHistory.slice(0, 30);
+        }
+        localStorage.setItem('browseHistory', JSON.stringify(browseHistory));
+    }
+
+    // 添加搜索记录
+    function addSearchRecord(keyword) {
+        if (!keyword || keyword.trim() === '') return;
+        let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        const currentTime = getCurrentTime();
+        const trimmedKeyword = keyword.trim();
+        const existingIndex = searchHistory.findIndex(record => record.keyword === trimmedKeyword);
+        if (existingIndex !== -1) searchHistory.splice(existingIndex, 1);
+        searchHistory.unshift({ keyword: trimmedKeyword, time: currentTime });
+        if (searchHistory.length > 30) searchHistory = searchHistory.slice(0, 30);
+        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+    }
+
+    // 读取收藏标签筛选
+    let favoriteTags = [];
+    try { favoriteTags = JSON.parse(localStorage.getItem('favoriteTags')) || []; }
+    catch (e) { favoriteTags = []; }
+    let useTagFilter = true;
+
+    // 更新基础数据
+    function updateBaseData() {
+        if (favoriteTags.length === 0) {
+            baseData = intangibleData;
+            $('#filter-tip').hide();
+        } else {
+            if (useTagFilter) {
+                baseData = intangibleData.filter(item => favoriteTags.includes(item.category));
+                $('#filter-tip').show();
+                $('#filter-tip-text').text(`当前筛选标签：${favoriteTags.join('、')}`);
+                $('#reset-tag-filter').show().text('显示全部');
+            } else {
+                // 临时显示全部状态
+                baseData = intangibleData;
+                $('#filter-tip').show();
+                $('#filter-tip-text').text('已显示全部项目（标签筛选已临时关闭）');
+                $('#reset-tag-filter').show().text('恢复标签选择');
+            }
+        }
+    }
+
+    updateBaseData();
+
+    // 生成详情页路径
+    function getHeritageDetailPath(name) {
+        return `../detail/detail.html?name=${encodeURIComponent(name)}`;
+    }
+
+    // 保存搜索状态（包括标签筛选状态）
+    function saveSearchState() {
+        const state = {
+            area: $('select[name="area"]').val(),
+            category: $('select[name="category"]').val(),
+            keyword: $('.search-box input').val().trim(),
+            page: currentPage,
+            useTagFilter: useTagFilter,  // 保存标签筛选状态
+            timestamp: Date.now()
+        };
+        localStorage.setItem('searchState', JSON.stringify(state));
+    }
+
+    // 恢复搜索状态（包括标签筛选状态）
+    function restoreSearchState() {
+        const savedState = JSON.parse(localStorage.getItem('searchState'));
+        if (!savedState) return;
+        $('select[name="area"]').val(savedState.area || '');
+        $('select[name="category"]').val(savedState.category || '');
+        $('.search-box input').val(savedState.keyword || '');
+        useTagFilter = savedState.useTagFilter !== undefined ? savedState.useTagFilter : true;
+        currentPage = savedState.page || 1;
+        updateBaseData();  // 使用恢复的 useTagFilter 更新数据
+    }
+
+    // 处理URL搜索参数
+    function handleUrlSearchParam() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchKeyword = urlParams.get('search');
+        const searchStateStr = urlParams.get('searchState');
+
+        // 优先处理新版完整搜索状态
+        if (searchStateStr) {
+            try {
+                const state = JSON.parse(decodeURIComponent(searchStateStr));
+                if (state) {
+                    $('select[name="area"]').val(state.area || '');
+                    $('select[name="category"]').val(state.category || '');
+                    $('.search-box input').val(state.keyword || '');
+                    useTagFilter = state.useTagFilter ?? true;
+                    currentPage = state.page || 1;
+                    updateBaseData();
+                    performSearch();
+                    return true;
+                }
+            } catch (e) {
+                console.error('解析搜索状态失败', e);
+            }
+        }
+
+        // 兼容旧版仅关键词搜索
+        if (searchKeyword) {
+            const key = decodeURIComponent(searchKeyword);
+            $('.search-box input').val(key);
+            currentPage = 1;
+            performSearch();
+            addSearchRecord(key);
+            return true;
+        }
+        return false;
+    }
+
+    // 清除搜索状态
+    $('#clear-search-state').on('click', function() {
+        localStorage.removeItem('searchState');
+        $('select[name="area"]').val('');
+        $('select[name="category"]').val('');
+        $('.search-box input').val('');
+        useTagFilter = true;
+        currentPage = 1;
+        updateBaseData();
+        performSearch();
+        alert('已清除搜索状态，已重置为全部数据');
+    });
+
+    // 显示全部/恢复标签选择 按钮点击事件
+    $('#reset-tag-filter').on('click', function() {
+        if (useTagFilter) {
+            // 当前是标签筛选状态，点击后显示全部
+            useTagFilter = false;
+        } else {
+            // 当前是显示全部状态，点击后恢复标签筛选
+            useTagFilter = true;
+        }
+        updateBaseData();
+        performSearch();
+        saveSearchState();  // 保存状态，包括 useTagFilter
+    });
+
+    function performSearch() {
+        const area = $('select[name="area"]').val();
+        const category = $('select[name="category"]').val();
+        const keyword = $('.search-box input').val().trim().toLowerCase();
+
+        currentFilteredData = baseData.filter(item => {
+            const areaMatch = !area || item.area.includes(area);
+            const cateMatch = !category || item.category.includes(category);
+            const keyMatch = !keyword ||
+                item.name.toLowerCase().includes(keyword) ||
+                item.category.toLowerCase().includes(keyword) ||
+                item.area.toLowerCase().includes(keyword) ||
+                (item.protectUnit && item.protectUnit.toLowerCase().includes(keyword));
+            return areaMatch && cateMatch && keyMatch;
+        });
+        renderTable();
+        saveSearchState();
+
+        // 保存搜索记录
+        if (keyword) {
+            let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            const currentTime = getCurrentTime();
+            const existingIndex = searchHistory.findIndex(record => record.keyword === keyword);
+            if (existingIndex !== -1) searchHistory.splice(existingIndex, 1);
+            
+            searchHistory.unshift({
+                keyword: keyword,
+                time: currentTime,
+                state: {
+                    area: area,
+                    category: category,
+                    keyword: keyword,
+                    page: currentPage,
+                    useTagFilter: useTagFilter
+                }
+            });
+            
+            if (searchHistory.length > 30) searchHistory = searchHistory.slice(0, 30);
+            localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+        }
+    }
+
+    // 渲染表格
+    function renderTable() {
+        const tbody = $('#heritage-tbody').empty();
+        const total = currentFilteredData.length;
+        if (total === 0) {
+            tbody.append('<tr><td colspan="5" style="text-align:center;">暂无相关非遗数据</td></tr>');
+            renderPagination();
+            return;
+        }
+
+        const start = (currentPage - 1) * pageSize;
+        const pageData = currentFilteredData.slice(start, start + pageSize);
+
+        pageData.forEach((item, i) => {
+            const tr = $(`
+                <tr>
+                    <td>${start + i + 1}</td>
+                    <td class="name" data-name="${item.name.replace(/"/g, '&quot;')}" style="color:#d92121;cursor:pointer;font-weight:500;">${item.name}</td>
+                    <td>${item.category}</td>
+                    <td>${item.area}</td>
+                    <td>${item.protectUnit || '-'}</td>
+                </tr>
+            `);
+            tbody.append(tr);
+        });
+
+        // 点击名称跳转详情
+        tbody.off('click', '.name').on('click', '.name', function () {
+            const name = $(this).data('name');
+            saveSearchState();
+            addBrowseRecord(name);
+            location.href = getHeritageDetailPath(name);
+        });
+        renderPagination();
+    }
+
+    // 分页渲染
+    function renderPagination() {
+        const el = $('#pagination').empty();
+        const total = currentFilteredData.length;
+        const totalPages = Math.ceil(total / pageSize);
+        if (totalPages <= 1) return;
+
+        const btn = (txt, disabled = false, active = false, fn) => {
+            const b = $(`<button>${txt}</button>`);
+            if (disabled) b.prop('disabled', true);
+            if (active) b.addClass('active');
+            if (fn) b.on('click', fn);
+            return b;
+        };
+
+        el.append(btn('首页', currentPage === 1, false, () => { currentPage = 1; renderTable(); }));
+        el.append(btn('上一页', currentPage === 1, false, () => { if (currentPage > 1) { currentPage--; renderTable(); } }));
+
+        const pages = new Set();
+        pages.add(1);
+        for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) pages.add(i);
+        pages.add(totalPages);
+        const arr = [...pages].sort((a, b) => a - b);
+
+        let last = 0;
+        arr.forEach(p => {
+            if (last + 1 < p) el.append(btn('...', false, false, () => {
+                const t = prompt(`输入页码（1-${totalPages}）`);
+                const num = parseInt(t);
+                if (num >= 1 && num <= totalPages) { currentPage = num; renderTable(); }
+            }));
+            el.append(btn(p, false, p === currentPage, () => { currentPage = p; renderTable(); }));
+            last = p;
+        });
+
+        el.append(btn('下一页', currentPage === totalPages, false, () => { if (currentPage < totalPages) { currentPage++; renderTable(); } }));
+        el.append(btn('末页', currentPage === totalPages, false, () => { currentPage = totalPages; renderTable(); }));
+    }
+
+    // 绑定搜索事件
+    $('#search-btn').on('click', () => { currentPage = 1; performSearch(); });
+    $('.search-box input').keypress(e => e.which === 13 && (currentPage = 1, performSearch()));
+    $('select[name="area"],select[name="category"]').change(() => { currentPage = 1; performSearch(); });
+
+    // 初始化执行顺序
+    const hasUrlSearch = handleUrlSearchParam();
+    if (!hasUrlSearch) {
+        restoreSearchState();
+        performSearch();
+    }
+});
+    </script>
+</body>
+</html>

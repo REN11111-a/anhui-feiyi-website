@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑动态</title>
+    <link rel="stylesheet" href="css/moment.css">
+</head>
+<body>
+    <div class="publish-container">
+        <textarea id="editContent"></textarea>
+        <div class="tool-bar">
+            <button id="saveBtn">保存修改</button>
+            <button id="setPrivacyBtn">修改权限</button>
+            <button id="deleteBtn">删除动态</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(location.search);
+        const postId = urlParams.get('id');
+        let currentPost = null;
+
+        window.onload = async () => {
+            const { data } = await supabase.from('posts').select('*').eq('id', postId).single();
+            currentPost = data;
+            document.getElementById('editContent').value = data.content;
+        };
+
+        document.getElementById('saveBtn').onclick = async () => {
+            const content = document.getElementById('editContent').value;
+            await supabase.from('posts').update({ content: content }).eq('id', postId);
+            alert('保存成功');
+            history.back();
+        };
+
+        document.getElementById('setPrivacyBtn').onclick = async () => {
+            const values = ['public', 'part', 'deny', 'self'];
+            const idx = prompt('0公开1部分2屏蔽3自己');
+            await supabase.from('posts').update({ privacy: values[idx] }).eq('id', postId);
+            alert('权限修改成功');
+        };
+
+        document.getElementById('deleteBtn').onclick = async () => {
+            if (confirm('确定删除这条动态吗？')) {
+                await supabase.from('posts').delete().eq('id', postId);
+                alert('删除成功');
+                history.back();
+            }
+        };
+    </script>
+</body>
+</html>

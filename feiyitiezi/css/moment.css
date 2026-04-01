@@ -1,0 +1,264 @@
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.profile-cover {
+    position: relative;
+    margin-bottom: 20px;
+}
+.cover-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+.profile-info {
+    position: absolute;
+    bottom: -50px;
+    left: 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+}
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+}
+.profile-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+}
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.profile-actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #07c160;
+    color: #fff;
+    cursor: pointer;
+}
+.moment-timeline {
+    margin-top: 80px;
+}
+.moment-item {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    position: relative;
+}
+.moment-item.pinned {
+    border: 2px solid #07c160;
+}
+.moment-images {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0;
+}
+.moment-images img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.moment-time {
+    color: #999;
+    font-size: 12px;
+}
+.moment-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.moment-actions button {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    background: #f5f5f5;
+    cursor: pointer;
+}
+.empty-timeline {
+    text-align: center;
+    color: #999;
+    padding: 40px 0;
+}
+
+/* 三个点按钮：放在标签左边 */
+.more-dots {
+    position: relative;
+    display: inline-block;
+    margin: 0 8px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+.more-dots span {
+    display: block;
+    width: 4px;
+    height: 4px;
+    background: #999;
+    border-radius: 50%;
+    margin: 2px 0;
+}
+.dots-menu {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 120px;
+    display: none;
+    z-index: 9999;
+}
+.dots-item {
+    padding: 12px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+}
+.dots-item.delete-item {
+    color: #ff4d4f;
+    border-bottom: 1px solid #f0f0f0;
+}
+.dots-item.cancel-item {
+    color: #333;
+}
+.dots-item:hover {
+    background-color: #f5f5f5;
+}
+/* 全局 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background: #f5f5f5;
+    font-family: "Microsoft YaHei", sans-serif;
+}
+
+/* 返回按钮 */
+.back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 999;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.4);
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.back-btn:hover {
+    background: rgba(0,0,0,0.6);
+}
+
+/* 个人主页封面 */
+.profile-cover {
+    width: 100%;
+    height: 260px;
+    background: linear-gradient(135deg, #f96464 0%, #764ba200 100%);
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 20px;
+    justify-content: center;
+}
+.profile-info-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.username {
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* 帖子列表 */
+.post-list-container {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+.post-list-container h3 {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 15px;
+    padding-left: 5px;
+}
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+}
+
+.moment-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: none;
+}
+.moment-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin: 0 0 6px 0;
+}
+.moment-content {
+    font-size: 15px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+.moment-meta {
+    font-size: 13px;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.moment-actions {
+    display: flex;
+    gap: 30px;
+    padding-top: 8px;
+    border-top: 1px solid #f5f5f5;
+}
+.moment-actions button {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}

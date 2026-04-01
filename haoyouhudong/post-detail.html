@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帖子详情 - 智承皖遗</title>
+    <link rel="stylesheet" href="post-detail.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* 顶部标题居中 */
+        .top-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 50px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid #eee;
+            z-index: 999;
+        }
+        .top-bar div:nth-child(2) {
+            flex: 1;
+            text-align: center;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        /* 评论操作弹窗 */
+        .comment-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+        .comment-modal .modal-content {
+            background: white;
+            width: 80%;
+            max-width: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .comment-modal .modal-btn {
+            padding: 12px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        .comment-modal .modal-btn:last-child { border-bottom: none; }
+        .comment-modal .modal-btn.danger { color: #ff4444; }
+        .comment-modal .modal-btn.primary { color: #007aff; }
+        .comment-modal .modal-btn.cancel { color: #666; }
+
+        /* 评论左侧回复图标 */
+        .comment-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .comment-text i {
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* 回复评论缩进样式 */
+        .comment-item.reply-item {
+            margin-left: 30px;
+            border-left: 2px solid #eee;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <div>帖子详情</div>
+    </div>
+
+    <div class="post-card">
+        <div class="post-header">
+            <img id="avatar" class="post-avatar" src="">
+            <div class="user-info">
+                <div id="nickname" class="nickname"></div>
+                <div id="time" class="post-time"></div>
+            </div>
+        </div>
+
+        <div id="content" class="post-content"></div>
+        <div id="images" class="post-images"></div>
+
+        <div class="post-actions">
+            <button id="deleteBtn" class="delete-btn" onclick="openModal()">
+                <i class="fa-solid fa-trash"></i> 删除
+            </button>
+            <button id="likeBtn" class="like-btn" onclick="toggleLike()">
+                <i class="fa-solid fa-heart"></i>
+                <span id="likeText">点赞</span>
+            </button>
+        </div>
+
+        <div class="like-list">
+            <div class="like-list-title">点赞过的人</div>
+            <div id="likeUsers" class="like-users"></div>
+        </div>
+
+        <div class="comment-section">
+            <div id="commentList"></div>
+        </div>
+    </div>
+
+    <div class="comment-input-bar">
+        <input class="comment-input" id="commentInput" placeholder="说点什么...">
+        <button class="send-btn" onclick="sendComment()">发送</button>
+    </div>
+
+    <!-- 删除帖子弹窗 -->
+    <div class="delete-modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-title">确定删除此帖子？</div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn confirm" onclick="deletePost()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 评论操作弹窗（删除 / 回复） -->
+    <div class="comment-modal" id="commentModal">
+        <div class="modal-content">
+            <div class="modal-btn" id="modalPrimaryBtn" onclick="handleCommentAction()"></div>
+            <div class="modal-btn cancel" onclick="closeCommentModal()">取消</div>
+        </div>
+    </div>
+
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/post-detail.js"></script>
+</body>
+</html>

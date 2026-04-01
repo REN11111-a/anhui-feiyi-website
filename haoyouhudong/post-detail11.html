@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帖子详情 - 智承皖遗</title>
+    <link rel="stylesheet" href="haoyouhudong.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <h1>智承皖遗</h1>
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+            <li><a href="../women/women.html">关于我们</a></li>
+            <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+            <li><a href="haoyouhudong.html">好友互动</a></li>
+            <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+        </ul>
+    </header>
+
+    <div class="main-content" style="display:block; max-width:800px; margin:0 auto; padding:20px;">
+        <div style="margin-bottom:15px;">
+            <button onclick="history.back()" style="padding:8px 16px; cursor:pointer;">
+                <i class="fas fa-arrow-left"></i> 返回社区
+            </button>
+        </div>
+
+        <div class="post-card" style="padding:20px; border-radius:8px; background:#fff;">
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+    <script src="../js/supabase-config.js"></script>
+    <script>
+        const postId = localStorage.getItem('currentPostId');
+        let currentPost = null;
+        let currentUser = null;
+
+        async function initDetailPage() {
+            if (!postId) {
+                alert('无效的帖子ID');
+                history.back();
+                return;
+            }
+
+            currentUser = await SupabaseAPI.getCurrentUser();
+            if (!currentUser) {
+                alert('请先登录');
+                location.href = '../denglu-zhuce/denglu-zhuce.html';
+                return;
+            }
+
+            const { data: post, error } = await SupabaseAPI.supabase
+                .from('posts')
+                .select('*')
+                .eq('id', postId)
+                .maybeSingle();
+
+            if (error || !post) {
+                console.error(error);
+                alert('加载帖子失败');
+                history.back();
+                return;
+            }
+
+            currentPost = post;
+            renderPostDetail();
+            loadLikesAndComments();
+        }
+
+        async function loadLikesAndComments() {
+            const { data: likes } = await SupabaseAPI.supabase
+                .from('likes')
+                .select('user_id, user_profiles(username, avatar)')
+                .eq('post_id', postId);
+
+            const { data: comments } = await SupabaseAPI.supabase
+                .from('comments')
+                .select('id, content, user_id, user_profiles(username, avatar)')
+                .eq('post_id', postId);
+
+            currentPost.likes = likes || [];
+            currentPost.comments = comments || [];
+            renderPostDetail();
+        }
+
+        function renderPostDetail() {
+            document.getElementById('detailContent').innerHTML = `
+                <div class="post-user">
+                    <img src="${currentPost?.user_profiles?.avatar || 'https://via.placeholder.com/40'}" class="avatar-img">
+                    <span>${currentPost?.user_profiles?.username || '用户'}</span>
+                    <label class="post-tag">${currentPost?.category || '未分类'}</label>
+                </div>
+                <h4 style="margin:12px 0; font-size:18px;">${currentPost?.title || '无标题'}</h4>
+                <p style="line-height:1.7; font-size:15px;">${currentPost?.content || '无内容'}</p>
+
+                <div style="margin:16px 0; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <span style="color:#666;">点赞(${currentPost?.likes?.length || 0})</span>
+                    ${currentPost?.likes?.map(l => `
+                        <img src="${l.user_profiles?.avatar || 'https://via.placeholder.com/30'}"
+                             style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                    `).join('')}
+                </div>
+
+                <div style="margin:20px 0;">
+                    <h4 style="margin-bottom:10px;">评论 ${currentPost?.comments?.length || 0}</h4>
+                    ${currentPost?.comments?.map(c => `
+                        <div style="display:flex; align-items:center; gap:8px; margin:8px 0; font-size:14px;">
+                            <img src="${c.user_profiles?.avatar || 'https://via.placeholder.com/28'}"
+                                 style="width:28px; height:28px; border-radius:50%; object-fit:cover;">
+                            <div><b>${c.user_profiles?.username || '匿名'}</b>：${c.content}</div>
+                        </div>
+                    `).join('') || '<span style="color:#999;">暂无评论</span>'}
+                </div>
+
+                ${currentUser && currentPost && currentUser.id === currentPost.user_id ? `
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button class="delete" onclick="deletePost()"
+                            style="padding:8px 14px; background:#f44336; color:white; border:none; border-radius:6px; cursor:pointer;">
+                        删除帖子
+                    </button>
+                    <button class="hide" onclick="hidePost()"
+                            style="padding:8px 14px; background:#999; color:white; border:none; border-radius:6px; cursor:pointer;">
+                        隐藏帖子
+                    </button>
+                </div>
+                ` : ''}
+            `;
+        }
+
+        async function deletePost() {
+            if (!confirm('确定删除这条帖子吗？')) return;
+            await SupabaseAPI.supabase.from('posts').delete().eq('id', currentPost.id);
+            alert('删除成功');
+            history.back();
+        }
+
+        async function hidePost() {
+            await SupabaseAPI.supabase.from('posts').update({ hidden: true }).eq('id', currentPost.id);
+            alert('已隐藏');
+            history.back();
+        }
+
+        document.addEventListener('DOMContentLoaded', initDetailPage);
+    </script>
+</body>
+</html>
