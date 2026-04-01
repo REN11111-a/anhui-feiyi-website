@@ -1,0 +1,683 @@
+/* 您的原有样式保持不变，仅微调了 h1 以适应新 logo */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+header {
+    background-color: black;
+    height: 80px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1001;      /* 高于机器人容器的1000 */
+}
+
+header ul {
+    position: absolute;
+    right: 5vw;
+    top: 0;
+    line-height: 80px;
+    list-style: none;
+}
+
+h1 {
+    color: white;
+    position: absolute;
+    left: 50px;
+    top: 2px;
+    width: 400px;          /* 根据需要调整logo宽度 */
+    height: 80px;
+    line-height: 60px;
+    background-image: url(images/logo1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    text-indent: -9999px;
+}
+
+header li {
+    display: inline;
+    margin-right: 4vw;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+
+header a:hover {
+    text-decoration: underline;
+}
+
+.quote {
+    color: white;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    height: calc(100vh - 80px);
+    width: 100%;
+    background-image: url("images/sanheguzhen2.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.quote h2 {
+    position: absolute;
+    z-index: 2;
+    line-height: 1.5;
+    font-size: 25px;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    white-space: nowrap;
+}
+
+.quote .map-img {
+    position: absolute;
+    left: 80px;
+    /* 👇 删除这行：transform: translateY(-50%); */
+    top: 100px;          /* 新增：从顶部开始 */
+    bottom: 0;       /* 新增：到底部结束 */
+    margin: auto 0;  /* 新增：垂直方向自动居中（无transform干扰） */
+    width: 500px;
+    height: auto;
+    opacity: 0.9;
+    z-index: 1;
+    /* 👇 新增：确保插件以图片为基准定位canvas */
+    position: relative;
+}
+
+/* 卢小胖容器（右侧固定，核心修复） */
+.avatar-wrap {
+    position: absolute;
+    right: -10px;           /* 右侧留出安全距离 */
+    top: 35%;              /* 从35%减小到15%，使机器人上移 */
+    transform: translateY(-50%);
+    width: 450px;
+    height: 700px;
+    z-index: 2;
+}
+
+.quote h2 {
+    position: absolute;
+    z-index: 2;
+    line-height: 1.5;
+    font-size: 25px;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    white-space: nowrap;
+}
+
+footer a {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    color: white;
+    text-decoration: none;
+    border: 3px solid #ACACAC;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.5);
+    text-align: center;
+    z-index: 1000;
+}
+
+/* 底部按钮 */
+footer a {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    color: white;
+    text-decoration: none;
+    border: 3px solid #ACACAC;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.5);
+    text-align: center;
+    z-index: 1000;
+}
+
+/* 插件生成的canvas不拦截点击 */
+canvas.maphilight-canvas,
+canvas {
+    pointer-events: none !important;
+    z-index: 5;
+}
+
+area {
+    cursor: pointer;
+}
+canvas {
+    pointer-events: none !important;
+}
+
+/* ===== 个人主页样式（优化：信息区整体下移）===== */
+.user-page {
+    padding: 80px 20px 20px;   /* 移除左内边距 */
+    min-height: 100vh;
+    background-image: url("../images/徽墨.jpg");
+    background-size: cover;
+    background-position: center 25%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;    /* 改为居中对齐 */
+    align-items: stretch;
+}
+
+.user-container {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 头像容器：使头像整体在modules-column中水平居中 */
+.user-avatar-wrapper {
+    position: relative;      /* 为按钮绝对定位提供参考？不，按钮相对于头像圆框定位，所以这里不需要relative，但保留无妨 */
+    margin: 0 auto 20px;     /* 水平居中，底部间距20px */
+    width: fit-content;      /* 宽度由内部头像圆框决定 */
+}
+
+/* 头像圆框：作为按钮的定位基准 */
+.user-avatar-large {
+    width: 100px;
+    height: 100px;
+    background-color: #f5f5f5;
+    border-radius: 50%;      /* 圆形 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    color: #d94848;
+    overflow: hidden;        /* 图片裁剪为圆形 */
+    cursor: pointer;
+    border: 2px solid #eee;
+    position: relative;      /* 作为相机按钮的定位基准 */
+}
+
+/* 头像图片样式 */
+.user-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;       /* 图片覆盖整个圆框，不变形 */
+}
+
+/* 相机修改按钮：固定在头像右下角 */
+.avatar-modify-btn {
+    position: absolute;
+    bottom: 0px;               /* 紧贴底部 */
+    right: 0px;                /* 紧贴右侧 */
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #d94848;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 10;             /* 确保按钮在最上层 */
+}
+
+.avatar-modify-btn:hover {
+    background-color: #c0392b;
+}
+
+/* 👇 核心修改：给信息区加 margin-top，让整体向下移动 */
+.user-info {
+    margin-top: 15px;    /* 新增：向下移动15px（可改10-20px，数值越大移得越多） */
+    margin-bottom: 25px;
+    flex-grow: 1;
+}
+
+.info-item {
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.info-item label {
+    width: 80px;
+    font-weight: 600;
+    color: #333;
+}
+
+.info-item input,
+.info-item textarea {
+    flex: 1;
+    padding: 9px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 220px;
+}
+
+.info-item textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.address-item input {
+    background-color: #f8f8f8;
+}
+
+.address-select {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    margin-left: 80px;
+    flex-wrap: wrap;
+}
+
+.address-select select {
+    padding: 9px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    flex: 1;
+    min-width: 130px;
+}
+
+.user-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.action-btn {
+    padding: 11px 22px;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modify-btn {
+    background-color: #007bff;
+}
+.modify-btn:hover {
+    background-color: #0056b3;
+}
+
+.logout-btn {
+    background-color: #dc3545;
+}
+.logout-btn:hover {
+    background-color: #c82333;
+}
+
+.select-intangible-btn {
+    background-color: #28a745;
+}
+.select-intangible-btn:hover {
+    background-color: #218838;
+}
+
+/* 响应式微调 */
+@media (max-width: 600px) {
+    .user-container {
+        padding: 20px;
+    }
+    .info-item label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    .address-select {
+        margin-left: 0;
+    }
+}
+
+
+.city-info-card {
+    position: absolute;
+    left: 600px;           /* 右移后位置，可根据需要微调 */
+    top: 120px;
+    width: 420px;          /* 稍微加宽以适应新内容 */
+    background: linear-gradient(145deg, rgba(255, 235, 235, 0.98), rgba(255, 210, 210, 0.98));
+    backdrop-filter: blur(5px);
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 0 0 0 2px #b22222 inset;
+    border: 1px solid #ffd700;
+    padding: 25px 30px;
+    z-index: 10;
+    color: #4a1c1c;
+    font-family: 'Microsoft YaHei', '华文楷体', serif;
+    pointer-events: none;
+    opacity: 1;
+    transform: none;
+}
+
+.city-info-content h3 {
+    text-align: center;        /* 新增：文字居中 */
+    margin: 0 0 20px 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: #8b0000;
+    border-bottom: 3px solid #ffd700;
+    padding-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
+    letter-spacing: 2px;
+}
+
+.info-stats p {
+    display: flex;
+    justify-content: space-between;
+    margin: 12px 0;
+    font-size: 16px;
+    line-height: 1.6;
+    border-bottom: 1px dashed #c08080;
+    padding-bottom: 8px;
+}
+
+.info-stats p span:first-child,
+.split-row p span:first-child {
+    font-weight: 500;
+    color: #8b4513;
+}
+
+.info-stats p span:last-child,
+.split-row p span:last-child {
+    font-weight: 600;
+    color: #2c1810;
+    text-align: right;
+}
+
+/* 额外信息样式 */
+.extra-info span:first-child {
+    color: #a0522d;
+}
+
+.extra-info span:last-child {
+    color: #5a2e1a;
+    font-style: normal;
+}
+
+/* 卡片底部口号 */
+.card-footer {
+    margin-top: 10px;           /* 与上方内容的间距，可根据需要保留或调整 */
+    text-align: center;
+    font-size: 18px;
+    font-weight: 400;
+    color: #b22222;
+    border-top: 1px solid #ffd700;
+    padding: 10px 0;            /* 上下内边距相等，文字自然垂直居中 */
+    letter-spacing: 4px;
+    text-shadow: 0 0 2px #ffcc00;
+    background: rgba(255, 255, 240, 0.2);
+    border-radius: 0 0 20px 20px;
+}
+
+/* 响应式调整 */
+@media (max-width: 1400px) {
+    .city-info-card {
+        left: 550px;
+        width: 380px;
+        padding: 20px 25px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .city-info-card {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 200px;
+        width: 350px;
+    }
+}
+
+html, body {
+    overflow: hidden;      /* 隐藏全局滚动条 */
+    height: 100%;          /* 配合使用 */
+}
+
+/* ===== 新增个人主页功能样式 ===== */
+/* 让容器内部支持滚动，避免内容过多溢出 */
+.user-container {
+    max-height: 90vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    padding-right: 20px;
+    max-width: 1000px;   /* 保持一致 */
+}
+
+/* 自定义滚动条美观 */
+.user-container::-webkit-scrollbar {
+    width: 6px;
+}
+.user-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+
+/* 足迹模块整体 */
+.user-history-section,
+.user-tags-section {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(3px);
+    border-radius: 16px;
+    padding: 18px 16px;
+    margin: 20px 0 10px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,215,0,0.3);
+}
+.user-tags-section {
+    margin-top: 0;
+}
+
+.user-history-section h3,
+.user-tags-section h3 {
+    font-size: 1.3rem;
+    color: #4a1c1c;
+    border-left: 5px solid #b22222;
+    padding-left: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.user-history-section h3 small button {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.user-history-section h3 small button:hover {
+    background: #5a6268;
+}
+
+/* 选项卡头部 */
+.tab-headers {
+    display: flex;
+    gap: 5px;
+    border-bottom: 2px solid #f0c0a0;
+    margin-bottom: 12px;
+}
+.tab-header {
+    padding: 8px 18px;
+    background: #f8f0e6;
+    border-radius: 20px 20px 0 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: #8b4513;
+    transition: 0.2s;
+    border: 1px solid transparent;
+    border-bottom: none;
+}
+.tab-header.active {
+    background: #d94848;
+    color: white;
+    border-color: #b22222;
+}
+.tab-content {
+    display: none;
+    min-height: 120px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 5px 0;
+}
+.tab-content.active {
+    display: block;
+}
+
+/* 历史列表 */
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.history-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px dashed #e0b6b6;
+    font-size: 0.95rem;
+}
+.history-list li:last-child {
+    border-bottom: none;
+}
+.history-item-name {
+    font-weight: 600;
+    color: #2c1810;
+}
+.history-item-time {
+    color: #8b5a5a;
+    font-size: 0.8rem;
+    background: #f9e0e0;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+.empty-history {
+    color: #aaa;
+    text-align: center;
+    padding: 25px 0;
+    font-style: italic;
+}
+
+/* 标签选择区 */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0 20px;
+}
+.tag-item {
+    background: #f0e0d0;
+    color: #5a2e1a;
+    padding: 8px 18px;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    user-select: none;
+}
+.tag-item.active {
+    background: #d94848;
+    color: white;
+    border-color: #b22222;
+    box-shadow: 0 4px 8px rgba(220, 60, 60, 0.3);
+}
+.tag-item.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+.tags-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+.save-tags-btn {
+    background-color: #8b4513;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 8px 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.save-tags-btn:hover {
+    background-color: #a05a2a;
+}
+/* 提示信息 */
+.tag-limit-hint {
+    font-size: 0.8rem;
+    color: #b22222;
+    margin-left: 10px;
+}
+
+/* 个人信息区域同样样式 */
+.user-info-section {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(3px);
+    border-radius: 16px;
+    padding: 18px 16px;
+    margin: 0 0 20px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,215,0,0.3);
+}
+.user-info-section .user-info {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.modules-column {
+    width: 600px;
+    margin-left: 40px;           /* 向右偏移40px，可根据需要调整 */
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* 固定机器人容器 */
+.robot-fixed-container {
+    position: absolute;
+    right: 200px;                /* 距离右侧边缘的距离，可根据视觉效果调整 */
+    top: 40%;
+    transform: translateY(-50%);
+    width: 400px;               /* 根据机器人模型的实际大小调整 */
+    height: 600px;
+    pointer-events: none; 
+    z-index: 1000;              /* 确保在导航栏之上（导航栏z-index:999） */
+    pointer-events: auto;     /* 允许与机器人交互（如点击、语音） */
+    /* 可选：添加半透明背景用于调试，正式时可移除 */
+    /* background: rgba(0,0,0,0.1); */
+}
+/* 最终修复：用户消息绝对靠右 */
+.message.user {
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+    text-align: left !important;
+}
+.message.user .text {
+    background: #e1f5fe !important;
+    margin: 0 !important;
+}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智承皖遗 - 关于我们</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- 使用本地 maphilight，jQuery 继续从 CDN 加载（若被拦截也可换本地） -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/jquery.maphilight.min.js"></script>
+    <script src="../js/auth.js"></script>
+    <!-- 👇 新增：Font Awesome 图标库（用于邮箱图标，不影响其他） -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="../js/three-vrm.js"></script>
+    <!-- 数字人模块（注意相对路径：当前页面在 women/ 下） -->
+    <script src="../shuziren/js/vrm-actions.js"></script>
+    <script src="../shuziren/js/vrm-core.js"></script>
+    <script src="../shuziren/js/vrm-women.js"></script>
+</head>
+<body>
+    <!-- 固定头部导航栏（完全未动） -->
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="../index.html">首页</a></li>
+        <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="../women/women.html">关于我们</a></li>
+        <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+    <!-- 👇 调整：团队成员改为4人，布局为“上1下3” -->
+    <main class="about-page">
+    <div class="about-container">
+        <h2 class="about-title">关于我们</h2>
+        <p class="about-subtitle">智承皖遗团队 — 致力于安徽非遗文化的数字化保护与传承</p>
+
+        <!-- 左右分栏：左边团队卡片，右边机器人 -->
+        <div class="about-content-row">
+            <!-- 左侧团队网格 (2x2) -->
+            <div class="team-grid">
+                <!-- 成员 1：雷宝琪 (第一行第一列) -->
+                <div class="team-card">
+                    <h3 class="member-name">雷宝琪</h3>
+                    <p class="member-role">团队负责人</p>
+                    <p class="member-task">负责项目整体规划、网页的总体架构设计</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i>3660932546@qq.com</p>
+                </div>
+                <!-- 成员 2：任悦锦 (第一行第二列) -->
+                <div class="team-card">
+                    <h3 class="member-name">任悦锦</h3>
+                    <p class="member-role">前端开发工程师</p>
+                    <p class="member-task">负责网站界面设计、交互实现与地图热点绘制</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i>2307158152@qq.com</p>
+                </div>
+                <!-- 成员 3：陈欢欢 (第二行第一列) -->
+                <div class="team-card">
+                    <h3 class="member-name">陈欢欢</h3>
+                    <p class="member-role">后端开发 / 数据库管理</p>
+                    <p class="member-task">负责数据存储、检索功能及服务器维护</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i>2201495631@qq.com </p>
+                </div>
+                <!-- 成员 4：吴子涵 (第二行第二列) -->
+                <div class="team-card">
+                    <h3 class="member-name">吴子涵</h3>
+                    <p class="member-role">内容编辑 / 非遗联络员</p>
+                    <p class="member-task">负责非遗资料采集、整理及传承人联络</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i>3608389434@qq.com</p>
+                </div>
+            </div>
+
+            <!-- 右侧机器人容器 -->
+            <div class="avatar-container-wrapper">
+                <div id="avatar-container" class="about-avatar-wrap"></div>
+            </div>
+        </div>
+
+        <!-- 感谢语（保持不变） -->
+        <div class="thanks-message">
+            <p>感谢您对本团队的支持！我们将继续致力于安徽非遗文化的数字化保护与传播。</p>
+            <p>如有任何建议或合作意向，欢迎通过邮箱联系我们。</p>
+        </div>
+    </div>
+</main>
+
+    <!-- 固定底部链接（完全未动） -->
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+   <script>
+        $(document).ready(function() {
+            $('.map-img').maphilight({
+                fill: true,
+                fillColor: 'ffcc00',
+                fillOpacity: 0.5,
+                stroke: true,
+                strokeColor: 'ffffff',
+                strokeWidth: 2,
+                fade: true
+            });
+            $('canvas').css('pointer-events', 'none');
+        });
+    </script>
+</body>
+</html>

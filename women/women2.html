@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智承皖遗 - 关于我们</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- 使用本地 maphilight，jQuery 继续从 CDN 加载（若被拦截也可换本地） -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/jquery.maphilight.min.js"></script>
+    <!-- 👇 新增：Font Awesome 图标库（用于邮箱图标，不影响其他） -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 固定头部导航栏（完全未动） -->
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="../index.html">首页</a></li>
+        <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="../women/women.html">关于我们</a></li>
+        <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+    <!-- 👇 新增：关于我们主体内容（完全独立，放在main中） -->
+    <main class="about-page">
+        <div class="about-container">
+            <h2 class="about-title">关于我们</h2>
+            <p class="about-subtitle">智承皖遗团队 — 致力于安徽非遗文化的数字化保护与传承</p>
+
+            <!-- 团队成员网格 -->
+            <div class="team-grid">
+                <!-- 成员 1 -->
+                <div class="team-card">
+                    <h3 class="member-name">雷宝琪</h3>
+                    <p class="member-role">项目负责人 / 非遗研究员</p>
+                    <p class="member-task">负责项目整体规划、非遗资源整理与学术研究</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i> zhangwq@example.com</p>
+                </div>
+                <!-- 成员 2 -->
+                <div class="team-card">
+                    <h3 class="member-name">李徽韵</h3>
+                    <p class="member-role">前端开发工程师</p>
+                    <p class="member-task">负责网站界面设计、交互实现与地图热点绘制</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i> lihy@example.com</p>
+                </div>
+                <!-- 成员 3 -->
+                <div class="team-card">
+                    <h3 class="member-name">王庐州</h3>
+                    <p class="member-role">后端开发 / 数据库管理</p>
+                    <p class="member-task">负责数据存储、检索功能及服务器维护</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i> wanglz@example.com</p>
+                </div>
+                <!-- 成员 4 -->
+                <div class="team-card">
+                    <h3 class="member-name">陈皖江</h3>
+                    <p class="member-role">内容编辑 / 非遗联络员</p>
+                    <p class="member-task">负责非遗资料采集、整理及传承人联络</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i> chenwj@example.com</p>
+                </div>
+                <!-- 成员 5 -->
+                <div class="team-card">
+                    <h3 class="member-name">赵新安</h3>
+                    <p class="member-role">UI设计师 / 视觉顾问</p>
+                    <p class="member-task">负责页面视觉设计、LOGO及宣传材料制作</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i> zhaoxa@example.com</p>
+                </div>
+                <!-- 成员 6 -->
+                <div class="team-card">
+                    <h3 class="member-name">周徽音</h3>
+                    <p class="member-role">测试与运维</p>
+                    <p class="member-task">负责网站功能测试、兼容性检查及日常维护</p>
+                    <p class="member-email"><i class="fas fa-envelope"></i> zhouhy@example.com</p>
+                </div>
+            </div>
+
+            <!-- 感谢语 -->
+            <div class="thanks-message">
+                <p>感谢您对本团队的支持！我们将继续致力于安徽非遗文化的数字化保护与传播。</p>
+                <p>如有任何建议或合作意向，欢迎通过邮箱联系我们。</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 固定底部链接（完全未动） -->
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+   <script>
+        $(document).ready(function() {
+            $('.map-img').maphilight({
+                fill: true,
+                fillColor: 'ffcc00',
+                fillOpacity: 0.5,
+                stroke: true,
+                strokeColor: 'ffffff',
+                strokeWidth: 2,
+                fade: true
+            });
+            $('canvas').css('pointer-events', 'none');
+        });
+    </script>
+</body>
+</html>

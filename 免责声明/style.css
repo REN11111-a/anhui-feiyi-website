@@ -1,0 +1,149 @@
+/* ===== 固定样式（请勿删除或修改，根据实际路径微调logo图）===== */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+header {
+    background-color: black;
+    height: 80px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+}
+
+header ul {
+    position: absolute;
+    right: 5vw;
+    top: 0;
+    line-height: 80px;
+    list-style: none;
+}
+
+h1 {
+    color: white;
+    position: absolute;
+    left: 50px;
+    top: 2px;
+    width: 400px;
+    height: 80px;
+    line-height: 60px;
+    /* 如果HTML文件在根目录，请将路径改为 images/logo1.png */
+    background-image: url(../images/logo1.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    text-indent: -9999px;
+}
+
+header li {
+    display: inline;
+    margin-right: 4vw;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+
+header a:hover {
+    text-decoration: underline;
+}
+
+/* 底部按钮 */
+footer a {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    color: white;
+    text-decoration: none;
+    border: 3px solid #ACACAC;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    z-index: 1000;
+}
+
+/* ===== 免责声明页面样式（独立，不影响固定样式）===== */
+.disclaimer-page {
+    padding: 100px 20px 60px;   /* 留出顶部固定导航栏的空间 */
+    min-height: calc(100vh - 80px);
+    background-image: url("../images/sanheguzhen2.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.disclaimer-doc {
+    width: 100%;
+    max-width: 900px;
+    background-color: #fff;
+    padding: 40px 50px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #eee;
+}
+
+.disclaimer-title {
+    font-size: 28px;
+    color: #d94848;
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 800;
+    border-bottom: 2px solid #d94848;
+    padding-bottom: 15px;
+}
+
+.disclaimer-subtitle {
+    font-size: 18px;
+    color: #333;
+    margin: 25px 0 15px;
+    font-weight: 700;
+}
+
+.disclaimer-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #444;
+}
+
+.disclaimer-intro {
+    margin-bottom: 20px;
+    text-indent: 2em;
+}
+
+.disclaimer-content p {
+    margin-bottom: 15px;
+    text-indent: 2em;
+}
+
+.disclaimer-contact,
+.disclaimer-date {
+    margin-top: 30px;
+    color: #666;
+    font-size: 15px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .disclaimer-doc {
+        padding: 20px 25px;
+    }
+    .disclaimer-title {
+        font-size: 24px;
+    }
+    .disclaimer-subtitle {
+        font-size: 16px;
+    }
+    .disclaimer-content {
+        font-size: 15px;
+    }
+}

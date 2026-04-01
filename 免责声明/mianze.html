@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智承皖遗 - 免责声明</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- 引入 jQuery 和 maphilight（保留，不影响本页） -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="../js/jquery.maphilight.min.js"></script>
+    <script src="../js/auth.js"></script>
+</head>
+<body>
+    <!-- 固定头部导航栏 -->
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="index.html">首页</a></li>
+        <li id="user-link"><a href="denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="women/women.html">关于我们</a></li>
+        <li><a href="fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="haoyouhudong/haoyouhudong.html"><i class="fa-regular fa-user-group"></i> 好友互动</a></li>
+        <li><a href="tuisong/tuisong.html"><i class="fa-regular fa-bell"></i> 内容推送</a></li>
+    </ul>
+</header>
+
+    <!-- 免责声明主体内容 -->
+    <main class="disclaimer-page">
+        <div class="disclaimer-doc">
+            <h2 class="disclaimer-title">免责声明</h2>
+            <div class="disclaimer-content">
+                <p class="disclaimer-intro">
+                    欢迎访问“智承皖遗 - 安徽省非遗文化数字化网”（以下简称“本网站”）。本网站仅为展示安徽省非物质文化遗产相关信息的公益性平台，您在使用本网站前，请仔细阅读以下免责声明：
+                </p>
+
+                <h3 class="disclaimer-subtitle">一、信息来源与准确性</h3>
+                <p>
+                    本网站所展示的非遗文化信息（包括但不限于文字、图片、音频、视频等）均来源于公开渠道及安徽省非遗保护中心公示内容，我们力求信息的准确性、完整性，但不保证信息的绝对准确性和完整性。若您发现信息有误，请及时联系我们更正。
+                </p>
+
+                <h3 class="disclaimer-subtitle">二、使用风险提示</h3>
+                <p>
+                    您通过本网站获取的任何信息仅作参考使用，本网站不对您依据这些信息所做出的任何决策（包括但不限于研究、学习、传播等）承担任何责任。因使用本网站信息而产生的任何直接或间接损失，本网站不承担赔偿责任。
+                </p>
+
+                <h3 class="disclaimer-subtitle">三、知识产权说明</h3>
+                <p>
+                    本网站的原创内容（包括但不限于页面设计、文案整理等）受著作权法保护，未经授权不得擅自转载、篡改、商用；非原创的非遗文化信息版权归原权利人所有，若侵犯了您的知识产权，请联系我们删除。
+                </p>
+
+                <h3 class="disclaimer-subtitle">四、第三方链接</h3>
+                <p>
+                    本网站可能包含第三方网站的链接，这些链接仅为方便您访问，我们不对第三方网站的内容、安全性、隐私政策等承担任何责任。
+                </p>
+
+                <h3 class="disclaimer-subtitle">五、免责声明的修改</h3>
+                <p>
+                    本网站有权根据实际情况修改本免责声明，修改后的声明将在本页面公示，无需另行通知。您继续使用本网站即视为接受修改后的免责声明。
+                </p>
+
+                <p class="disclaimer-contact">
+                    联系我们：若您对本免责声明有任何疑问，可通过网站“关于我们”页面的联系方式与我们沟通。
+                </p>
+
+                <p class="disclaimer-date">
+                    最后更新时间：2026年3月
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部固定链接 -->
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+    <script>
+        $(document).ready(function() {
+            // 地图高亮代码（此页面无地图，保留无害）
+            if ($('.map-img').length) {
+                $('.map-img').maphilight({
+                    fill: true,
+                    fillColor: 'ffcc00',
+                    fillOpacity: 0.5,
+                    stroke: true,
+                    strokeColor: 'ffffff',
+                    strokeWidth: 2,
+                    fade: true
+                });
+                $('canvas').css('pointer-events', 'none');
+            }
+        });
+    </script>
+</body>
+</html>

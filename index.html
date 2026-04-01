@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智承皖遗 - 安徽省非遗文化数字化网</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- 使用本地 maphilight，jQuery 继续从 CDN 加载（若被拦截也可换本地） -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="js/jquery.maphilight.min.js"></script>
+    <script src="js/auth.js"></script>
+    <!-- 卢小胖3D依赖 - 使用稳定版本 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="js/three-vrm.js"></script>
+    <!-- 引入数字人模块 -->
+    <script src="shuziren/js/vrm-actions.js"></script>
+    <script src="shuziren/js/vrm-core.js"></script>
+    <script src="shuziren/js/voice-interaction.js"></script>
+    <script src="shuziren/js/vrm-map.js"></script>
+</head>
+<body>
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="index.html">首页</a></li>
+        <li id="user-link"><a href="denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="women/women.html">关于我们</a></li>
+        <li><a href="fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+    <main>
+        <section class="quote">
+            <img src="images/dituyikou.png" alt="安徽省地图" class="map-img" usemap="#anhui-map">
+            <map name="anhui-map">
+                <!-- 多边形描述 -->
+                <area target="_self" alt="合肥" title="合肥" href="hefei/hefei.html" coords="249,238,258,247,272,256,279,270,293,268,309,270,312,289,321,303,316,321,321,331,321,345,300,349,295,366,284,386,284,398,265,400,249,393,240,372,251,352,263,347,233,345,214,340,209,317,223,298,237,294,235,273,237,247" shape="poly">
+                <area target="_self" alt="滁州" title="滁州" href="chuzhou/chuzhou.html" coords="391,212,388,199,399,191,409,191,416,200,426,202,432,224,422,240,401,230,383,227,375,232,384,241,383,267,366,278,361,291,353,289,346,298,352,295,340,302,331,308,315,301,310,290,311,271,298,268,284,270,274,269,277,272,274,258,268,251,270,244,258,247,252,235,247,223,254,211,274,205,280,190,290,197,300,185,311,182,313,190,324,186,327,174,338,165,343,181,344,194,350,190,347,202,352,212,361,215,375,215" shape="poly">
+                <area target="_self" alt="芜湖" title="芜湖" href="wuhu/wuhu.html" coords="299,404,287,402,284,390,287,379,294,369,300,355,312,348,321,348,326,353,333,355,342,356,339,343,347,343,355,346,358,351,362,343,366,349,367,355,375,355,378,359,380,366,387,365,388,371,393,377,395,381,390,386,387,394,381,400,375,405,374,412,373,421,365,414,359,419,356,425,358,430,349,429,344,434,341,427,331,421,336,413,344,407,336,398,327,390,318,386,320,392,312,386,305,395" shape="poly">
+                <area target="_self" alt="铜陵" title="铜陵" href="tonglin/tonglin.html" coords="253,393,247,402,247,416,250,427,257,434,269,435,280,435,288,428,304,421,313,425,322,420,332,414,341,407,334,397,322,392,309,386,306,397,297,400,285,402,273,406,262,402" shape="poly">
+                <area target="_self" alt="马鞍山" title="马鞍山" href="maanshan/maanshan.html" coords="358,286,359,298,371,306,376,319,385,317,389,328,396,326,402,331,406,343,406,353,395,359,386,364,375,357,366,348,356,348,349,343,339,343,342,353,333,354,324,349,319,342,322,333,319,324,317,313,322,303,330,307,338,303,347,298,353,293" shape="poly">
+                <area target="_self" alt="亳州" title="亳州" href="bozhou/bozhou.html" coords="113,78,126,85,137,86,139,95,145,102,151,111,156,117,163,114,176,110,182,115,186,123,188,131,191,140,200,140,212,146,213,156,215,164,213,172,210,183,214,189,209,195,198,196,188,194,177,192,176,201,168,206,160,203,156,196,149,194,144,187,136,183,129,179,127,167,135,164,132,152,126,145,116,140,106,130,103,115,109,107,101,97,104,85,121,75" shape="poly">
+                <area target="_self" alt="淮南" title="淮南" href="huainan/huainan.html" coords="176,193,177,204,181,212,183,222,188,227,193,232,199,238,193,241,187,250,188,261,189,275,192,286,196,293,203,297,207,306,215,305,225,300,228,293,234,295,236,284,234,275,240,269,234,255,240,241,250,238,248,224,241,217,233,215,225,209,215,201,197,197" shape="poly">
+                <area target="_self" alt="阜阳" title="阜阳" href="fuyang/fuyang.html" coords="109,129,98,133,82,139,82,153,82,168,75,179,64,182,47,178,47,190,43,196,48,200,62,205,69,212,71,225,73,237,90,239,98,248,114,254,104,257,126,247,134,237,142,236,151,242,156,249,165,247,173,243,178,249,186,249,192,242,197,234,186,225,182,212,177,203,170,205,160,200,147,195,144,185,129,179,127,164,132,158,130,148,118,140" shape="poly">
+                <area target="_self" alt="蚌埠" title="蚌埠" href="bengbu/bengbu.html" coords="253,136,237,148,226,157,212,166,212,182,209,194,219,203,230,210,244,215,258,206,272,203,279,189,291,196,300,185,314,185,326,178,319,161,302,155,286,155,270,148" shape="poly">
+                <area target="_self" alt="池州" title="池州" href="chizhou/chizhou.html" coords="218,552,209,545,215,532,226,524,225,514,218,503,226,491,232,480,228,462,240,455,254,457,262,447,257,440,272,433,280,435,305,421,310,427,326,417,342,431,325,462,320,476,318,483,311,490,295,494,301,494,290,502,274,504,259,509,254,516,247,527,252,536,243,543,227,554" shape="poly">
+                <area target="_self" alt="安庆" title="安庆" href="anqing/anqing.html" coords="151,402,151,410,142,415,134,421,131,430,125,437,131,447,139,457,139,467,140,478,149,484,155,499,156,514,161,527,171,531,186,524,198,520,203,503,217,501,233,480,229,464,239,456,256,458,257,438,248,427,246,401,246,384,236,375,217,395,194,400,194,384,181,386,168,396,158,395" shape="poly">
+                <area target="_self" alt="淮北" title="淮北" href="huaibei/huaibei.html" coords="192,77,198,82,205,79,213,77,222,74,226,86,229,93,226,99,223,111,224,120,218,124,220,131,225,142,225,151,220,160,210,152,200,141,189,140,188,127,181,114,181,104,189,98,199,99,199,89" shape="poly">
+                <area target="_self" alt="宣城" title="宣城" href="xuancheng/xuancheng.html" coords="389,366,400,372,416,370,429,369,435,363,441,368,451,363,452,374,461,378,472,378,477,384,476,395,471,405,467,416,461,432,453,430,445,434,443,443,452,442,453,451,456,461,444,469,432,467,419,464,410,476,411,485,411,492,400,496,392,501,386,506,380,501,375,493,369,493,362,486,355,475,357,466,351,455,341,459,341,449,330,451,344,434,357,427,359,417,366,414,373,420,374,408,384,398,390,388,393,379,390,372" shape="poly">
+                <area target="_self" alt="宿州" title="宿州" href="suzhou/suzhou.html" coords="156,27,175,17,189,32,206,38,224,45,231,62,245,76,262,78,276,80,287,86,294,100,299,109,320,107,334,106,329,125,320,141,311,151,295,158,283,153,269,148,255,135,247,144,236,153,224,158,224,137,219,120,226,99,226,76,210,74,212,86,199,83,187,73,191,55,170,57,157,41" shape="poly">
+                <area target="_self" alt="六安" title="六安" href="liuan/liuan.html" coords="132,242,135,263,139,283,135,308,135,321,118,324,104,330,94,345,88,356,89,368,97,375,104,384,108,391,115,383,124,389,135,387,140,397,149,402,156,396,167,396,179,387,191,389,196,397,204,394,218,396,228,391,235,379,243,373,245,360,249,351,257,349,245,344,231,345,215,346,214,334,212,321,209,309,202,299,194,289,189,276,188,264,188,252,177,248,168,242,161,250,151,245,141,236" shape="poly">
+                <area target="_self" alt="黄山" title="黄山" href="huangshan/huangshan.html" coords="328,451,327,462,322,472,316,481,313,488,302,492,291,496,283,504,269,508,257,513,262,522,270,525,278,523,280,532,282,540,288,543,292,550,301,548,309,555,318,551,329,554,339,550,344,559,351,569,364,566,371,556,381,555,385,546,395,539,401,525,408,512,417,502,413,492,395,499,384,508,379,497,368,493,355,478,359,466,349,457,339,451" shape="poly">
+            </map>
+            <h2>“要扎实做好非物质文化遗产的系统性保护,实现中华文化的创造性转化和创新性发展。”——习近平</h2>
+
+<div class="city-info-card" id="cityInfoCard">
+    <div class="city-info-content">
+        <h3 id="cityName">安徽省</h3>
+        <div class="info-stats">
+    <p><span>🏯 建城历史</span> <span id="cityHistory">约2200年</span></p>
+    <p><span>📊 非遗项目总数</span> <span id="totalItems">0</span></p>
+    <p><span>🏅 国家级项目</span> <span id="nationalItems">0</span></p>
+    <p><span>📜 省级项目</span> <span id="provincialItems">0</span></p>
+    <p><span>🌟 代表性非遗</span> <span id="representative">——</span></p>
+    
+    <!-- 清空静态默认值，由JS动态赋值 -->
+    <p class="extra-info"><span>👥 传承人数量</span> <span id="inheritorsNum"></span></p>
+    <p class="extra-info"><span>🏛️ 保护单位</span> <span id="basesNum"></span></p>
+</div>
+        <div class="card-footer">徽风皖韵·匠心传承</div>
+    </div>
+</div>
+            <div id="avatar-container" class="avatar-wrap"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+   <script>
+        $(document).ready(function() {
+    $('.map-img').maphilight({
+        fill: true,
+        fillColor: 'ffcc00',
+        fillOpacity: 0.5,
+        stroke: true,
+        strokeColor: 'ffffff',
+        strokeWidth: 2,
+        fade: true
+    });
+    
+    $('canvas').css('pointer-events', 'none');
+
+const cityData = {
+    "合肥": {
+        history: "约2200年",
+        total: 13,
+        national: 2,
+        provincial: 8,
+        representative: "庐剧、火笔画、三河羽扇",
+        inheritors: "6位",
+        bases: "8个"
+    },
+    "芜湖": {
+        history: "2500余年",
+        total: 14,
+        national: 2,
+        provincial: 8,
+        representative: "芜湖铁画、梨簧戏",
+        inheritors: "4位",
+        bases: "6个"
+    },
+    "蚌埠": {
+        history: "2000余年",
+        total: 15,
+        national: 1,
+        provincial: 5,
+        representative: "泗州戏、五河民歌",
+        inheritors: "1位",
+        bases: "7个"
+    },
+    "淮南": {
+        history: "2400余年",
+        total: 11,
+        national: 2,
+        provincial: 8,
+        representative: "花鼓灯、淮南牛肉汤传说",
+        inheritors: "7位",
+        bases: "7个"
+    },
+    "马鞍山": {
+        history: "2200余年",
+        total: 5,
+        national: 0,
+        provincial: 1,
+        representative: "当涂民歌、采石矶茶干",
+        inheritors: "1位",
+        bases: "5个"
+    },
+    "淮北": {
+        history: "4000余年",
+        total: 4,
+        national: 1,
+        provincial: 3,
+        representative: "淮北花鼓戏、民间剪纸",
+        inheritors: "2位",
+        bases: "3个"
+    },
+    "铜陵": {
+        history: "约3000年",
+        total: 4,
+        national: 1,
+        provincial: 2,
+        representative: "铜陵牛歌、竹马灯",
+        inheritors: "2位",
+        bases: "3个"
+    },
+    "安庆": {
+        history: "1800余年",
+        total: 22,
+        national: 3,
+        provincial: 14,
+        representative: "黄梅戏、岳西高腔",
+        inheritors: "6位",
+        bases: "13个"
+    },
+    "黄山": {
+        history: "2200余年",
+        total: 46,
+        national: 18,
+        provincial: 28,
+        representative: "徽剧、歙砚、万安罗盘",
+        inheritors: "24位",
+        bases: "15个"
+    },
+    "滁州": {
+        history: "1600余年",
+        total: 18,
+        national: 2,
+        provincial: 15,
+        representative: "凤阳花鼓、秧歌灯",
+        inheritors: "10位",
+        bases: "12个"
+    },
+    "阜阳": {
+        history: "3000余年",
+        total: 23,
+        national: 4,
+        provincial: 13,
+        representative: "界首彩陶、颍上花鼓灯",
+        inheritors: "18位",
+        bases: "13个"
+    },
+    "宿州": {
+        history: "3000余年",
+        total: 23,
+        national: 6,
+        provincial: 14,
+        representative: "坠子戏、萧县农民画",
+        inheritors: "15位",
+        bases: "11个"
+    },
+    "六安": {
+        history: "4000余年",
+        total: 24,
+        national: 3,
+        provincial: 15,
+        representative: "庐剧（西路）、大别山民歌",
+        inheritors: "11位",
+        bases: "12个"
+    },
+    "亳州": {
+        history: "3700余年",
+        total: 16,
+        national: 4,
+        provincial: 8,
+        representative: "二夹弦、华佗五禽戏",
+        inheritors: "15位",
+        bases: "7个"
+    },
+    "池州": {
+        history: "1300余年",
+        total: 14,
+        national: 2,
+        provincial: 12,
+        representative: "傩戏、青阳腔",
+        inheritors: "13位",
+        bases: "9个"
+    },
+    "宣城": {
+        history: "2000余年",
+        total: 29,
+        national: 6,
+        provincial: 23,
+        representative: "宣纸、徽剧、绩溪徽墨",
+        inheritors: "20位",
+        bases: "14个"
+    }
+};
+
+    const $infoCard = $('#cityInfoCard');
+    const $cityName = $('#cityName');
+    const $cityHistory = $('#cityHistory');
+    const $totalItems = $('#totalItems');
+    const $nationalItems = $('#nationalItems');
+    const $provincialItems = $('#provincialItems');
+    const $representative = $('#representative');
+    // 改用ID选择器，100%精准匹配
+    const $inheritors = $('#inheritorsNum');  
+    const $bases = $('#basesNum');       
+
+    // 更新城市信息函数
+    function updateCityInfo(cityName) {
+        const data = cityData[cityName];
+        if (data) {
+            $cityName.text(cityName);
+            $cityHistory.text(data.history);
+            $totalItems.text(data.total);
+            $nationalItems.text(data.national);
+            $provincialItems.text(data.provincial);
+            $representative.text(data.representative);
+            // 强制更新传承人和保护单位字段
+            $inheritors.text(data.inheritors);
+            $bases.text(data.bases);
+        }
+    }
+    
+    // 初始化：默认显示合肥信息（确保覆盖所有字段）
+    updateCityInfo("合肥");
+
+    // 绑定鼠标进入事件：更新为对应城市信息
+    $('area').on('mouseenter', function() {
+        const cityName = $(this).attr('alt') || $(this).attr('title');
+        if (!cityName) return;
+        updateCityInfo(cityName);
+    });
+})
+    </script>
+</body>
+</html>

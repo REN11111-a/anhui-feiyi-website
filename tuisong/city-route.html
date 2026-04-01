@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>非遗旅游路线详情 - 智承皖遗</title>
+    <link rel="stylesheet" href="tuisong.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .route-detail-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .route-detail-image {
+            width: 100%;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+            margin-bottom: 25px;
+        }
+        .route-day-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff9800;
+            margin: 25px 0 15px 0;
+            padding-left: 15px;
+            border-left: 4px solid #ff9800;
+        }
+        .route-step {
+            padding: 12px 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .back-btn {
+            display: inline-block;
+            background: #ff9800;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            background: #f57c00;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .info-box i {
+            font-size: 22px;
+            color: #ff9800;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>智承皖遗</h1>
+    <ul>
+        <li><a href="../index.html">首页</a></li>
+        <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+        <li><a href="../women/women.html">关于我们</a></li>
+        <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+        <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+        <li><a href="../tuisong/tuisong.html">内容推送</a></li>
+    </ul>
+</header>
+
+<div class="main-content">
+    <a href="javascript:history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i> 返回上一页
+    </a>
+    <h2 id="cityTitle" style="color:white; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); margin-bottom:20px;"></h2>
+
+    <div class="route-detail-card">
+        <div id="detailImage" class="route-detail-image"></div>
+        <div class="info-grid">
+            <div class="info-box">
+                <i class="fas fa-route"></i>
+                <div>游玩天数</div>
+                <strong id="dayCount">1日</strong>
+            </div>
+            <div class="info-box">
+                <i class="fas fa-utensils"></i>
+                <div>推荐美食</div>
+                <strong id="foodText">当地特色</strong>
+            </div>
+            <div class="info-box">
+                <i class="fas fa-bus"></i>
+                <div>交通方式</div>
+                <strong id="trafficText">景区直通车</strong>
+            </div>
+            <div class="info-box">
+                <i class="fas fa-star"></i>
+                <div>适合人群</div>
+                <strong>文化爱好者</strong>
+            </div>
+        </div>
+        <div id="routeDetailContent"></div>
+    </div>
+</div>
+
+<footer>
+    <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+</footer>
+
+<script src="../js/data.js"></script>
+<script>
+    // ====================== 修复：登录状态同步 ======================
+    // 页面加载时自动判断登录状态，切换导航文字
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = localStorage.getItem('currentUser');
+        const userLink = document.getElementById('user-link');
+        if (currentUser) {
+            userLink.innerHTML = '<a href="../profile.html">个人主页</a>';
+        } else {
+            userLink.innerHTML = '<a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a>';
+        }
+    });
+
+    // ====================== 原有路线逻辑 ======================
+    const urlParams=new URLSearchParams(window.location.search);
+    const city=decodeURIComponent(urlParams.get('city'));
+    const days=parseInt(urlParams.get('days')) || 1;
+
+    document.getElementById('cityTitle').textContent = `${city}非遗${days}日游路线（按您的兴趣筛选）`;
+
+    const cityPure=city.replace("市", "");
+    document.getElementById('detailImage').style.backgroundImage = `url('../images/${cityPure}风光.jpg')`;
+
+    function getUserFavoriteTags() {
+        const tagsStr=localStorage.getItem('favoriteTags');
+        return tagsStr ? JSON.parse(tagsStr) : [];
+    }
+
+    function getFilteredCityHeritages(cityName) {
+        const pureCity=cityName.replace("市", "");
+        const favoriteTags=getUserFavoriteTags();
+        return intangibleData.filter(item => {
+            const areaMatch=item.area.includes(pureCity);
+            if (favoriteTags.length === 0) {
+                return areaMatch;
+            }
+            return areaMatch && favoriteTags.some(tag => item.category.includes(tag));
+        });
+    }
+
+    function categorizeHeritages(heritages) {
+        const categories={
+            美食类: [],
+            技艺类: [],
+            表演类: [],
+            其他类: []
+        };
+        heritages.forEach(h => {
+            if (h.category.includes("美食") || h.name.includes("菜") || h.name.includes("饼") || h.name.includes("面") || h.name.includes("糕")) {
+                categories.美食类.push(h);
+            } else if (h.category.includes("技艺") || h.category.includes("制作")) {
+                categories.技艺类.push(h);
+            } else if (h.category.includes("戏剧") || h.category.includes("音乐") || h.category.includes("舞蹈")) {
+                categories.表演类.push(h);
+            } else {
+                categories.其他类.push(h);
+            }
+        });
+        return categories;
+    }
+
+    function generateDynamicFilteredRoute(cityName, inputDays) {
+        const filteredHeritages=getFilteredCityHeritages(cityName);
+        const cat=categorizeHeritages(filteredHeritages);
+        const totalValid=filteredHeritages.length;
+
+        if (totalValid < 2) {
+            const pureCity=cityName.replace("市", "");
+            const supplement= intangibleData.filter(item => 
+                item.area.includes(pureCity) && 
+                !filteredHeritages.some(h => h.name === item.name)
+            ).slice(0, 2);
+            filteredHeritages.push(...supplement);
+        }
+
+        const useDays=Math.min(Math.max(1, Math.ceil(filteredHeritages.length/2)), 3, inputDays);
+        document.getElementById("dayCount").innerText=useDays + "日游";
+
+        const foodList=cat.美食类.map(h => h.name).join("、");
+        document.getElementById("foodText").innerText=foodList || `${cityName}特色美食`;
+
+        document.getElementById("trafficText").innerText=filteredHeritages.length > 4 ? "旅游专线+景区直通车" : "公共交通+步行";
+
+        let html = "";
+        let remaining = [...filteredHeritages];
+
+        for (let d=1; d <= useDays; d++) {
+            html += `<div class="route-day-title">📅 第${d}天行程</div>`;
+            const dayItems=remaining.splice(0, Math.min(3, remaining.length));
+
+            dayItems.forEach((item, i) => {
+                let desc=item.description.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+                if (desc.length > 60) desc=desc.substring(0, 60) + "...";
+
+                let icon = "📌";
+                if (cat.美食类.includes(item)) icon = "🍽️";
+                else if (cat.技艺类.includes(item)) icon = "🛠️";
+                else if (cat.表演类.includes(item)) icon = "🎭";
+
+                html += `
+                    <div class="route-step">
+                        ${icon} <strong>${item.name}</strong>
+                        <br><small>${desc}</small>
+                    </div>
+                `;
+            });
+
+            if (dayItems.length > 0) {
+                html += `
+                    <div class="route-step">
+                        ⏸️ 中途休息，${foodList ? `推荐品尝${foodList}` : `尝尝${cityName}的特色小吃`}
+                    </div>
+                `;
+            }
+        }
+
+        if (filteredHeritages.length > 0) {
+            html += `
+                <div class="route-step">
+                    🎁 行程结束，可选购本次体验非遗对应的文创伴手礼
+                </div>
+            `;
+        } else {
+            html += `<div class="route-step">暂时没有找到匹配您兴趣的非遗，建议在个人主页添加更多标签~</div>`;
+        }
+
+        document.getElementById("routeDetailContent").innerHTML=html;
+    }
+
+    generateDynamicFilteredRoute(city, days);
+</script>
+</body>
+</html>

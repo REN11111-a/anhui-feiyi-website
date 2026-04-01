@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能内容推送 - 智承皖遗</title>
+    <link rel="stylesheet" href="tuisong.css">
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>智承皖遗</h1>
+        <ul>
+            <li><a href="../index.html">首页</a></li>
+            <li id="user-link"><a href="../denglu-zhuce/denglu-zhuce.html">用户登录与注册</a></li>
+            <li><a href="../women/women.html">关于我们</a></li>
+            <li><a href="../fenleijiansuo/fenleijiansuo.html">分类检索</a></li>
+            <li><a href="../haoyouhudong/haoyouhudong.html">好友互动</a></li>
+            <li><a href="tuisong.html">内容推送</a></li>
+        </ul>
+    </header>
+
+    <div class="main-content">
+        <!-- 用户画像卡片 -->
+        <div class="user-profile-card" id="userProfile">
+            <!-- 动态生成 -->
+        </div>
+
+        <!-- 新增：旅游路线推荐 -->
+        <div class="recommend-section">
+            <div class="section-header">
+                <h2 class="section-title">🧭 非遗旅游路线规划</h2>
+                <button class="refresh-btn" onclick="refreshRouteRecommendations()">
+                    <i class="fas fa-sync-alt"></i> 换一批
+                </button>
+            </div>
+            <div id="routeRecommendationsList" class="cards-grid">
+                <!-- 动态生成旅游路线 -->
+            </div>
+        </div>
+
+        <!-- 推荐内容区域 -->
+        <div class="recommend-section">
+            <div class="section-header">
+                <h2 class="section-title">🎯 为您推荐</h2>
+                <button class="refresh-btn" onclick="refreshRecommendations()">
+                    <i class="fas fa-sync-alt"></i> 换一批
+                </button>
+            </div>
+            <div id="recommendationsList" class="cards-grid">
+                <!-- 动态生成推荐内容 -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p><a href="http://www.anhuify.net/html/Index/index.html">点击这里了解更多安徽非遗文化！</a></p>
+    </footer>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/tuisong.js"></script>
+</body>
+</html>
