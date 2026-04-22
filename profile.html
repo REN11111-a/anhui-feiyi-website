@@ -16,6 +16,7 @@
     <script src="shuziren/js/vrm-core.js"></script>
     <script src="shuziren/js/vrm-profile.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    // AI辅助生成：DeepSeek-V3.2, 2026-4-21
     <script>
         const SUPABASE_URL = "https://tmybqhnldswwwreikwvt.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_gSFRZVYpIuGZFqyLzU1BGw_8yrXfdXX";
@@ -62,7 +63,6 @@
             <div class="user-info-section">
                 <div class="user-info">
                     <div class="info-item"><label>用户名:</label><span id="user-account"></span></div>
-                    <div class="info-item"><label>昵称:</label><input type="text" id="user-nickname" placeholder="请输入昵称"></div>
                     <div class="info-item"><label>手机号:</label><input type="text" id="user-phone" placeholder="请输入手机号"></div>
                     <div class="info-item"><label>邮箱:</label><input type="email" id="user-email" placeholder="请输入邮箱"></div>
                     <div class="info-item"><label>简介:</label><textarea id="user-intro" rows="3" placeholder="介绍一下自己吧~"></textarea></div>
@@ -139,7 +139,6 @@ $(document).ready(function() {
     // 加载用户信息
     $('#user-account').text(currentUser);
     const savedInfo = JSON.parse(localStorage.getItem('userInfo_' + currentUser)) || {};
-    $('#user-nickname').val(savedInfo.nickname || '');
     $('#user-phone').val(savedInfo.phone || '');
     $('#user-email').val(savedInfo.email || '');
     $('#user-intro').val(savedInfo.intro || '');
@@ -703,7 +702,6 @@ $(document).ready(function() {
     // ========== 修改信息 ==========
     $('.modify-btn').on('click', function() {
         const info = {
-            nickname: $('#user-nickname').val(),
             phone: $('#user-phone').val(),
             email: $('#user-email').val(),
             intro: $('#user-intro').val(),
