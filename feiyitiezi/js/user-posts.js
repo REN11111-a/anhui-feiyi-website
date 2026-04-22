@@ -45,13 +45,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const actionBtns = document.getElementById('profileActions');
     const coverEditBtn = document.getElementById('coverEditBtn');
     if (isMyProfile) {
-        actionBtns.style.display = 'flex';
-        coverEditBtn.style.display = 'flex';
+        if (actionBtns) actionBtns.style.display = 'flex';
+        if (coverEditBtn) coverEditBtn.style.display = 'flex';
         // 初始化封面上传功能（仅当是自己的主页时）
         initCoverFunction();
     } else {
-        actionBtns.style.display = 'none';
-        coverEditBtn.style.display = 'none';
+        if (actionBtns) actionBtns.style.display = 'none';
+        if (coverEditBtn) coverEditBtn.style.display = 'none';
     }
 
     const manageBtn = document.getElementById('manageBtn');
@@ -131,6 +131,7 @@ async function deleteSelectedPosts() {
     }
 }
 
+// ==================== 【核心修复】正确读取个人简介 ====================
 async function loadUserProfileFromSupabase() {
     try {
         const { data: profile, error } = await supabaseClient
@@ -140,6 +141,7 @@ async function loadUserProfileFromSupabase() {
             .single();
 
         if (error || !profile) {
+            console.warn('未找到用户资料或查询出错:', error);
             const avatarEl = document.getElementById('profileAvatar');
             const nameEl = document.getElementById('profileName');
             const bioEl = document.getElementById('profileBio');
@@ -149,20 +151,47 @@ async function loadUserProfileFromSupabase() {
             return;
         }
 
+        console.log('成功加载用户资料:', profile);
+        
         const avatarEl = document.getElementById('profileAvatar');
         const nameEl = document.getElementById('profileName');
         const bioEl = document.getElementById('profileBio');
         
-        if (avatarEl) avatarEl.src = profile.avatar || 'https://via.placeholder.com/90';
-        if (nameEl) nameEl.textContent = profile.nickname || '用户名';
-        if (bioEl) bioEl.textContent = profile.intro || '这个人很懒，什么都没写~';
+        // 正确设置头像
+        if (avatarEl) {
+            avatarEl.src = profile.avatar && profile.avatar !== 'null' ? profile.avatar : 'https://via.placeholder.com/90';
+        }
+        
+        // 正确设置昵称
+        if (nameEl) {
+            nameEl.textContent = profile.nickname && profile.nickname !== 'null' ? profile.nickname : '用户名';
+        }
+        
+        // 正确设置个人简介 - 核心修复点
+        if (bioEl) {
+            // 直接使用数据库中的 intro 字段
+            const introText = profile.intro && profile.intro.trim() !== '' ? profile.intro : '这个人很懒，什么都没写~';
+            bioEl.textContent = introText;
+            console.log('已设置个人简介:', introText);
+        }
         
         // 加载封面图片
-        if (profile.cover_image) {
+        if (profile.cover_image && profile.cover_image !== 'null') {
             updateCoverBackground(profile.cover_image);
+        } else {
+            updateCoverBackground(null);
         }
+        
+        // 同时将简介存储到 localStorage 作为备份（可选）
+        if (profile.intro) {
+            localStorage.setItem('user_bio_' + profileUserId, profile.intro);
+        }
+        
     } catch (err) {
         console.error('加载用户资料失败', err);
+        // 发生错误时显示默认内容
+        const bioEl = document.getElementById('profileBio');
+        if (bioEl) bioEl.textContent = '这个人很懒，什么都没写~';
     }
 }
 
