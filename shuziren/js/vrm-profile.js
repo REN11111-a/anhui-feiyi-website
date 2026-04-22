@@ -36,6 +36,7 @@ function fixMouseEvents() {
 }
 
 // ========== 停止当前个人主页互动 ==========
+//AI辅助生成：DeepSeek-V3.2，2026-4-21
 function stopProfileInteraction() {
     console.log('停止当前个人主页互动');
     
