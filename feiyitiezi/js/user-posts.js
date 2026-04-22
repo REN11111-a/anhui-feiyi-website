@@ -38,13 +38,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadUserProfileFromSupabase();
     await loadMoments();
-    loadSavedCover();
+    
+    // 从数据库加载封面（替代原来的 loadSavedCover）
+    await loadCoverFromDatabase(profileUserId);
 
     const actionBtns = document.getElementById('profileActions');
     const coverEditBtn = document.getElementById('coverEditBtn');
     if (isMyProfile) {
         actionBtns.style.display = 'flex';
         coverEditBtn.style.display = 'flex';
+        // 初始化封面上传功能（仅当是自己的主页时）
+        initCoverFunction();
     } else {
         actionBtns.style.display = 'none';
         coverEditBtn.style.display = 'none';
@@ -131,7 +135,7 @@ async function loadUserProfileFromSupabase() {
     try {
         const { data: profile, error } = await supabaseClient
             .from('user_profiles')
-            .select('nickname, intro, avatar')
+            .select('nickname, intro, avatar, cover_image')
             .eq('id', profileUserId)
             .single();
 
@@ -152,6 +156,11 @@ async function loadUserProfileFromSupabase() {
         if (avatarEl) avatarEl.src = profile.avatar || 'https://via.placeholder.com/90';
         if (nameEl) nameEl.textContent = profile.nickname || '用户名';
         if (bioEl) bioEl.textContent = profile.intro || '这个人很懒，什么都没写~';
+        
+        // 加载封面图片
+        if (profile.cover_image) {
+            updateCoverBackground(profile.cover_image);
+        }
     } catch (err) {
         console.error('加载用户资料失败', err);
     }
@@ -281,43 +290,180 @@ async function setGlobalPrivacy() {
     alert('设置成功');
 }
 
-// ==================== 封面 ====================
-document.addEventListener('DOMContentLoaded', () => {
-    const coverInput = document.getElementById('coverInput');
+// ==================== 封面图片管理（Base64存储版）====================
+
+// 初始化封面功能
+function initCoverFunction() {
     const coverEditBtn = document.getElementById('coverEditBtn');
-    const profileCover = document.querySelector('.profile-cover');
+    const coverInput = document.getElementById('coverInput');
+    
+    if (!coverEditBtn || !coverInput) return;
+    
+    // 移除旧的事件监听器（避免重复绑定）
+    const newCoverEditBtn = coverEditBtn.cloneNode(true);
+    const newCoverInput = coverInput.cloneNode(true);
+    coverEditBtn.parentNode.replaceChild(newCoverEditBtn, coverEditBtn);
+    coverInput.parentNode.replaceChild(newCoverInput, coverInput);
+    
+    // 重新绑定事件
+    newCoverEditBtn.addEventListener('click', () => {
+        newCoverInput.click();
+    });
+    
+    newCoverInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        if (!file.type.startsWith('image/')) {
+            alert('请选择图片格式文件！');
+            return;
+        }
+        
+        if (file.size > 5 * 1024 * 1024) {
+            alert('图片不能超过5MB！');
+            return;
+        }
+        
+        await uploadCoverImage(file);
+    });
+}
 
-    if (coverEditBtn && coverInput) {
-        coverEditBtn.addEventListener('click', () => coverInput.click());
-
-        coverInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file || !file.type.startsWith('image/')) {
-                alert('请选择图片格式文件！');
-                return;
-            }
-
+// 上传封面图片（直接存储Base64到数据库）
+async function uploadCoverImage(file) {
+    const coverEditBtn = document.getElementById('coverEditBtn');
+    const originalText = coverEditBtn.innerHTML;
+    
+    coverEditBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 上传中...';
+    coverEditBtn.disabled = true;
+    
+    try {
+        const userId = profileUserId;
+        
+        // 压缩图片
+        const compressedFile = await compressImage(file, 800, 0.7);
+        
+        // 读取文件为Base64
+        const base64 = await new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = (event) => {
-                const coverUrl = event.target.result;
-                if (profileCover) {
-                    profileCover.style.background = `url(${coverUrl}) center center / cover`;
-                }
-                localStorage.setItem('cover_' + profileUserId, coverUrl);
-                supabaseClient.from('user_profiles').update({ cover: coverUrl }).eq('id', profileUserId);
-            };
-            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(compressedFile);
         });
+        
+        // 存储Base64到数据库
+        const { error: updateError } = await supabaseClient
+            .from('user_profiles')
+            .update({ 
+                cover_image: base64,
+            })
+            .eq('id', userId);
+        
+        if (updateError) {
+            console.error('保存封面失败:', updateError);
+            alert('保存失败：' + updateError.message);
+            return;
+        }
+        
+        // 更新页面背景
+        updateCoverBackground(base64);
+        alert('封面更新成功！');
+        
+    } catch (error) {
+        console.error('上传封面出错:', error);
+        alert('上传失败，请重试');
+    } finally {
+        coverEditBtn.innerHTML = originalText;
+        coverEditBtn.disabled = false;
+        const coverInput = document.getElementById('coverInput');
+        if (coverInput) coverInput.value = '';
     }
-});
+}
 
-function loadSavedCover() {
-    const profileCover = document.querySelector('.profile-cover');
-    const saved = localStorage.getItem('cover_' + profileUserId);
-    if (saved && profileCover) {
-        profileCover.style.background = `url(${saved}) center center / cover`;
-    } else if (profileCover) {
-        profileCover.style.background = "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=300&fit=crop') center center / cover";
+// 图片压缩函数
+function compressImage(file, maxWidth, quality) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, file.type, quality);
+            };
+            img.onerror = reject;
+        };
+        reader.onerror = reject;
+    });
+}
+
+// 更新页面封面背景
+function updateCoverBackground(coverUrl) {
+    const coverDiv = document.querySelector('.profile-cover');
+    if (!coverDiv) return;
+    
+    if (coverUrl && coverUrl !== 'null') {
+        coverDiv.style.background = `url(${coverUrl})`;
+        coverDiv.style.backgroundSize = 'cover';
+        coverDiv.style.backgroundPosition = 'center';
+        
+        // 添加半透明遮罩
+        let overlay = coverDiv.querySelector('.cover-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.className = 'cover-overlay';
+            overlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.3);
+                border-radius: 16px;
+                pointer-events: none;
+            `;
+            coverDiv.insertBefore(overlay, coverDiv.firstChild);
+        }
+    } else {
+        // 恢复默认渐变背景
+        coverDiv.style.background = 'linear-gradient(135deg, #ff6868 0%, #764ba200 100%)';
+        const overlay = coverDiv.querySelector('.cover-overlay');
+        if (overlay) overlay.remove();
+    }
+}
+
+// 从数据库加载封面图片
+async function loadCoverFromDatabase(userId) {
+    try {
+        const { data: userData, error } = await supabaseClient
+            .from('user_profiles')
+            .select('cover_image')
+            .eq('id', userId)
+            .single();
+        
+        if (!error && userData && userData.cover_image && userData.cover_image !== 'null') {
+            updateCoverBackground(userData.cover_image);
+        } else {
+            updateCoverBackground(null);
+        }
+    } catch (error) {
+        console.error('加载封面失败:', error);
+        updateCoverBackground(null);
     }
 }
 
