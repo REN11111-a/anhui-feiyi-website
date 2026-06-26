@@ -82,7 +82,7 @@ header a:hover {
     position: absolute;
     left: 80px;
     /* 👇 删除这行：transform: translateY(-50%); */
-    top: 0px;          /* 新增：从顶部开始 */
+    top: -40px;          /* 新增：从顶部开始 */
     bottom: 0;       /* 新增：到底部结束 */
     margin: auto 0;  /* 新增：垂直方向自动居中（无transform干扰） */
     width: 500px;
