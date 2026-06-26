@@ -71,7 +71,7 @@
     </div>
     
     <div class="audio-tip" id="audioTip">🎵 点击页面任意位置，激活语音播放</div>
-
+    <script src="config.js"></script>
     <script>
         // ========== 登录状态 ==========
         var currentUser = localStorage.getItem('currentUser');
@@ -564,7 +564,7 @@
                 audioTip.classList.remove('show');
             }, 3000);
         }
-
+        
         // AI辅助生成：DeepSeek-V3.2, 2026-4-21
         function enableAudio() {
             if (audioEnabled) return;
