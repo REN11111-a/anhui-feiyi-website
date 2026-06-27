@@ -460,6 +460,10 @@ function initPage() {
     });
 
     document.getElementById('searchUserBtn').addEventListener('click', searchUsers);
+    const friendFilterInput = document.getElementById('friendFilterInput');
+    if (friendFilterInput) {
+        friendFilterInput.addEventListener('input', loadFriends);
+    }
 
     document.getElementById('openAddFriendModal').addEventListener('click', async () => {
         const count = await checkAndShowFriendRequestBadge();
@@ -481,15 +485,24 @@ function initPage() {
 async function loadFriends() {
     const friends = await SupabaseAPI.getMyFriends(currentUser.id);
     const friendsList = document.getElementById('friendsList');
+    const keyword = (document.getElementById('friendFilterInput')?.value || '').trim().toLowerCase();
+    const myAvatar = currentUserProfile?.avatar || 'https://via.placeholder.com/45';
+    const myName = escapeHtml(currentUserProfile?.nickname || currentUserProfile?.username || localStorage.getItem('currentUser') || '我');
+    const visibleFriends = (friends || []).filter(friend => {
+        const searchableName = `${friend.nickname || ''} ${friend.username || ''}`.toLowerCase();
+        return !keyword || searchableName.includes(keyword);
+    });
 
-    if (!friends || friends.length === 0) {
-        friendsList.innerHTML = '<div class="empty-friends">暂无好友</div>';
-        return;
-    }
+    friendsList.style.display = 'flex';
+    friendsList.style.flexDirection = 'column';
 
-    friendsList.innerHTML = friends.map(friend => `
+    const friendsHtml = (!friends || friends.length === 0)
+        ? '<div class="empty-friends">暂无好友</div>'
+        : visibleFriends.length === 0
+            ? '<div class="empty-friends">未找到好友</div>'
+            : visibleFriends.map(friend => `
         <div class="friend-item" data-id="${friend.id}" style="position:relative;">
-            <div style="position:relative;width:32px;height:32px;">
+            <div class="friend-avatar-link" data-profile-id="${friend.id}" title="查看朋友圈主页" style="position:relative;width:32px;height:32px;cursor:pointer;">
                 <img src="${friend.avatar || 'https://via.placeholder.com/32'}" class="friend-avatar">
                 <div class="unread-dot" style="display:${unreadMessages[friend.id] ? 'block' : 'none'};"></div>
             </div>
@@ -499,6 +512,15 @@ async function loadFriends() {
             <button class="del-friend-btn" onclick="deleteFriend('${friend.id}', event)">🗑️</button>
         </div>
     `).join('');
+
+    friendsList.innerHTML = friendsHtml + `
+        <div class="my-profile-shortcut" data-profile-id="${currentUser.id}" title="查看我的朋友圈主页" style="margin-top:auto;padding:12px;display:flex;align-items:center;gap:12px;cursor:pointer;border-top:1px solid #f0f0f0;">
+            <img src="${myAvatar}" class="friend-avatar" alt="${myName}">
+            <div class="friend-info">
+                <div class="friend-name">${myName}</div>
+            </div>
+        </div>
+    `;
 
     friendsList.querySelectorAll('.friend-item').forEach(item => {
         item.addEventListener('click', async () => {
@@ -513,6 +535,21 @@ async function loadFriends() {
             loadFriends();
         });
     });
+
+    friendsList.querySelectorAll('.friend-avatar-link').forEach(avatar => {
+        avatar.addEventListener('click', e => {
+            e.stopPropagation();
+            goToProfile(avatar.dataset.profileId);
+        });
+    });
+
+    const myProfileShortcut = friendsList.querySelector('.my-profile-shortcut');
+    if (myProfileShortcut) {
+        myProfileShortcut.addEventListener('click', e => {
+            e.stopPropagation();
+            goToProfile(myProfileShortcut.dataset.profileId);
+        });
+    }
 }
 
 // ==================== 删除好友 ====================
@@ -556,10 +593,20 @@ async function loadChatHistory() {
 
     chatMsgEl.innerHTML = messages.map(msg => `
         <div class="message-item ${msg.from_user === currentUser.id ? 'me' : ''}">
-            <div class="message-avatar"><img src="${msg.from_user === currentUser.id ? myAvatar : friendAvatar}"></div>
+            <div class="message-avatar" data-profile-id="${msg.from_user}" title="查看朋友圈主页" style="cursor:pointer;">
+                <img src="${msg.from_user === currentUser.id ? myAvatar : friendAvatar}">
+            </div>
             <div class="message-content">${escapeHtml(msg.content)}</div>
         </div>
     `).join('');
+
+    chatMsgEl.querySelectorAll('.message-avatar').forEach(avatar => {
+        avatar.addEventListener('click', e => {
+            e.stopPropagation();
+            goToProfile(avatar.dataset.profileId);
+        });
+    });
+
     chatMsgEl.scrollTop = chatMsgEl.scrollHeight;
 }
 
@@ -596,6 +643,7 @@ async function searchUsers() {
             </div>
             <div style="flex:1;">
                 <div style="font-weight:bold;">${escapeHtml(u.nickname || u.username)}</div>
+                <div style="font-size:12px;color:#999;">账号：${escapeHtml(u.username || '未设置')}</div>
                 <div style="font-size:12px;color:#999;">${u.tags?.slice(0,2).join(' · ') || '暂无标签'}</div>
             </div>
             <button class="add-friend-result-btn" onclick="sendFriendRequest('${u.id}')">加好友</button>
