@@ -93,16 +93,27 @@ $(document).ready(function() {
     // 同步用户资料到 user_profiles（登录/注册都会调用）
     async function syncUserProfile(userId, username) {
         try {
-            await supabaseClient
+            const { data: existingProfile } = await supabaseClient
                 .from('user_profiles')
-                .upsert([
-                    {
+                .select('id')
+                .eq('id', userId)
+                .maybeSingle();
+
+            if (existingProfile) {
+                await supabaseClient
+                    .from('user_profiles')
+                    .update({ username: username })
+                    .eq('id', userId);
+            } else {
+                await supabaseClient
+                    .from('user_profiles')
+                    .insert({
                         id: userId,
                         username: username,
                         nickname: username,
                         created_at: new Date().toISOString()
-                    }
-                ], { onConflict: 'id' });
+                    });
+            }
         } catch (e) {}
     }
 
