@@ -81,7 +81,7 @@ header a:hover {
 }
 
 .friends-header {
-    background: linear-gradient(135deg, #ff5555 0%, #764ba200 100%);
+    background: linear-gradient(135deg, #ffbe19);
     color: white;
     padding: 15px 20px;
     display: flex;
@@ -141,7 +141,7 @@ header a:hover {
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff4a5a 0%, #764ba200 100%);
+    background: linear-gradient(135deg, #ffbe19);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -224,7 +224,7 @@ header a:hover {
 }
 
 .chat-header {
-    background: linear-gradient(135deg, #ff6868 0%, #764ba200 100%);
+    background: linear-gradient(135deg, #ffbe19);
     color: white;
     padding: 15px 20px;
     font-weight: 500;
@@ -363,7 +363,7 @@ header a:hover {
 }
 
 .community-header {
-    background: linear-gradient(135deg, #f65d5d 0%, #764ba200 100%);
+    background: linear-gradient(135deg, #ffbe19);
     color: white;
     padding: 15px 20px;
     display: flex;
@@ -601,7 +601,7 @@ header a:hover {
 .search-btn {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, #f6676b 0%, #764ba200 100%);
+    background: linear-gradient(135deg, #ffbe19);
     color: white;
     border: none;
     border-radius: 25px;
@@ -625,7 +625,7 @@ header a:hover {
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #fa6868 0%, #764ba200 100%);
+    background: linear-gradient(135deg, #ffbe19);
     color: white;
     overflow: hidden;
 }
@@ -670,7 +670,7 @@ header a:hover {
 .submit-post-btn {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(135deg, #f46464 0%, #764ba200 100%);
+    background: linear-gradient(135deg, #ffbe19);
     color: white;
     border: none;
     border-radius: 25px;
@@ -714,7 +714,7 @@ footer a {
     position: absolute;
     top: -8px;
     right: -8px;
-    background: #f44336;
+    background: #ffbe19;
     color: white;
     font-size: 10px;
     padding: 2px 5px;
@@ -764,7 +764,7 @@ footer a {
   text-align: center;
 }
 .dots-item.delete-item {
-  color: #ff4d4f;
+  color: #ffbe19;
   border-bottom: 1px solid #f0f0f0;
 }
 .dots-item.cancel-item {
