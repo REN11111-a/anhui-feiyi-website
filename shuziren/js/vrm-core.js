@@ -225,6 +225,10 @@ showLoadingStatus('加载模型中...');
         document.getElementById('avatar-container').innerHTML = '<div style="color:red; padding:20px;">初始化失败：' + error.message + '</div>';
     }
 });
+function isLuxiaopangChatPage() {
+    const currentPath = window.location.pathname.replace(/\/+$/, '');
+    return /(^|\/)(AI\/)?chat_with_luxiaopang(\.html)?$/i.test(currentPath);
+}
 // ==================== 添加数字人右侧竖排气泡按钮 ====================
 function createAvatarBubbleButton() {
     // 判断当前页面是否是聊天界面
