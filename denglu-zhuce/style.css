@@ -77,7 +77,7 @@ footer a {
     justify-content: center;
     position: relative;
     padding: 80px 20px 20px; /* 上下左右留白 */
-    background-image: url("../images/徽墨.jpg"); /* 直接复用主页背景图 */
+    background-image: url("../images/sanheguzhen2.png"); /* 直接复用主页背景图 */
     background-size: cover;
     background-position: center 25%; /* 从顶部往下10%开始显示，折中空白----------------关键调整*/
     background-repeat: no-repeat;
