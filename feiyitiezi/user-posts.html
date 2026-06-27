@@ -13,6 +13,9 @@ user.posts.html
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
     <style>
+        body {
+    background: url('../images/11.jpg') center center / cover fixed no-repeat !important;
+}
         /* 封面编辑按钮 */
         .cover-edit-btn {
             position: absolute;
@@ -65,7 +68,7 @@ user.posts.html
 
         /* 封面背景（默认渐变，无上传则白色） */
         .profile-cover {
-            background: linear-gradient(135deg, #ff6868 0%, #764ba200 100%);
+            background: linear-gradient(135deg, #ffffff );
             padding: 60px 20px 40px;
             border-radius: 16px;
             position: relative;
@@ -123,6 +126,8 @@ user.posts.html
 
         /* 帖子时间轴 */
         .moment-timeline {
+            border: 2px solid rgba(255, 104, 104, 0.35);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.08);
             background: white;
             border-radius: 16px;
             padding: 20px;
