@@ -20,7 +20,9 @@
             background-attachment: fixed;
             position: relative;
         }
-
+        .avatar-bubble-wrapper {
+    display: none !important;
+}
         header {
             background-color: black;
             height: 80px;
