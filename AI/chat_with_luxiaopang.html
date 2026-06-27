@@ -71,7 +71,6 @@
     </div>
     
     <div class="audio-tip" id="audioTip">🎵 点击页面任意位置，激活语音播放</div>
-    <script src="config.js"></script>
     <script>
         // ========== 登录状态 ==========
         var currentUser = localStorage.getItem('currentUser');
@@ -400,11 +399,9 @@
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${API_KEY}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    model: MODEL_NAME,
                     messages: [
                         { 
                             role: "system", 
