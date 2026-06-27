@@ -470,7 +470,7 @@ function updateCoverBackground(coverUrl) {
         }
     } else {
         // 恢复默认渐变背景
-        coverDiv.style.background = 'linear-gradient(135deg, #ff6868 0%, #764ba200 100%)';
+        coverDiv.style.background = 'linear-gradient(135deg, #fff3ce, #fff9e6)';
         const overlay = coverDiv.querySelector('.cover-overlay');
         if (overlay) overlay.remove();
     }
