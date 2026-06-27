@@ -409,7 +409,7 @@ function renderUserProfile() {
         avatarHtml = '<i class="fas fa-user-circle"></i>';
     }
     
-    const userNickname = userInfo.nickname || currentUser || '游客';
+    const userNickname = localStorage.getItem('currentNickname') || userInfo.nickname || currentUser || '游客';
     
     const profileHtml = `
         <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
@@ -418,8 +418,6 @@ function renderUserProfile() {
             </div>
             <div>
                 <h2 style="margin: 0 0 5px 0; color: #333;">${escapeHtml(userNickname)}</h2>
-                <p style="margin: 0; color: #666;"><i class="fas fa-envelope"></i> ${escapeHtml(currentUser)}</p>
-                <p style="margin: 5px 0 0 0; color: #ff9800;"><i class="fas fa-calendar-alt"></i> 欢迎回来！</p>
             </div>
         </div>
         
