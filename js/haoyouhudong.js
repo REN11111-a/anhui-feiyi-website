@@ -1,3 +1,4 @@
+const supabase = SupabaseAPI.supabase;
 let currentUser = null;
 
 // 页面加载完成后初始化
