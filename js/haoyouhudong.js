@@ -2,6 +2,15 @@ let currentUser = null;
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', async () => {
+    let waitCount = 0;
+    while (typeof SupabaseAPI === 'undefined' && waitCount < 30) {
+        await new Promise(r => setTimeout(r, 100));
+        waitCount++;
+    }
+    if (typeof SupabaseAPI === 'undefined') {
+        alert('系统加载失败，请刷新页面重试');
+        return;
+    }
     // 获取当前登录用户
     const { data: { user } } = await supabase.auth.getUser();
     currentUser = user;
