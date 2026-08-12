@@ -3,8 +3,7 @@ let currentUser = null;
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', async () => {
     // 获取当前登录用户
-    const { data: { user } } = await supabase.auth.getUser();
-    currentUser = user;
+     currentUser = await SupabaseAPI.getCurrentUser();
     if (!currentUser) {
         alert('请先登录');
         location.href = '../denglu-zhuce/denglu-zhuce.html';
