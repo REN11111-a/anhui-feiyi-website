@@ -1,32 +1,7 @@
-// ✅ 安全地初始化 supabase（避免重复声明）
-if (typeof SupabaseAPI !== 'undefined') {
-    if (typeof supabase === 'undefined') {
-        var supabase = SupabaseAPI.supabase;
-    } else {
-        supabase = SupabaseAPI.supabase;
-    }
-}
-
 let currentUser = null;
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', async () => {
-    // 等待 SupabaseAPI 加载
-    let waitCount = 0;
-    while (typeof SupabaseAPI === 'undefined' && waitCount < 30) {
-        await new Promise(r => setTimeout(r, 100));
-        waitCount++;
-    }
-    if (typeof SupabaseAPI === 'undefined') {
-        alert('系统加载失败，请刷新页面重试');
-        return;
-    }
-    
-    // 确保 supabase 有值
-    if (!supabase) {
-        supabase = SupabaseAPI.supabase;
-    }
-    
     // 获取当前登录用户
     currentUser = await SupabaseAPI.getCurrentUser();
     if (!currentUser) {
@@ -43,17 +18,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // 加载所有帖子
 async function loadPosts() {
-    if (!supabase) {
-        console.error('supabase 未初始化');
-        return;
-    }
-    
-    const { data: posts } = await supabase
+    const { data: posts } = await SupabaseAPI.supabase
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false });
 
-    const postList = document.querySelector('.post-list');
+    const postList = document.getElementById('postsList');
     if (!posts || posts.length === 0) {
         postList.innerHTML = '<div style="text-align:center;color:#999;padding:20px">暂无帖子</div>';
         return;
@@ -61,6 +31,7 @@ async function loadPosts() {
 
     postList.innerHTML = posts.map(post => `
         <div class="post-item" data-id="${post.id}">
+            <!-- 三个点按钮（仅自己帖子显示） -->
             ${post.user_id === currentUser.id ? `
             <div class="more-dots">
                 <span></span><span></span><span></span>
@@ -98,44 +69,46 @@ async function loadPosts() {
         </div>
     `).join('');
 
+    // 重新绑定三个点交互
     bindMoreDots();
 }
 
 // 绑定三个点交互
 function bindMoreDots() {
+    // 点击三个点显示菜单
     document.querySelectorAll('.more-dots').forEach(dot => {
         dot.onclick = (e) => {
             e.stopPropagation();
+            // 先关闭其他菜单
             document.querySelectorAll('.dots-menu').forEach(menu => {
                 menu.style.display = 'none';
             });
-            const menu = dot.querySelector('.dots-menu');
-            if (menu) menu.style.display = 'block';
+            // 显示当前菜单
+            dot.querySelector('.dots-menu').style.display = 'block';
         };
     });
 
+    // 点击删除
     document.querySelectorAll('.delete-item').forEach(item => {
         item.onclick = async (e) => {
             e.stopPropagation();
-            if (!confirm('确定要删除这个帖子吗？')) return;
             const postId = item.closest('.post-item').dataset.id;
-            if (!supabase) {
-                alert('系统未就绪，请刷新重试');
-                return;
-            }
-            await supabase.from('posts').delete().eq('id', postId);
+            // 删除帖子
+            await SupabaseAPI.supabase.from('posts').delete().eq('id', postId);
+            // 刷新列表
             loadPosts();
         };
     });
 
+    // 点击取消
     document.querySelectorAll('.cancel-item').forEach(item => {
         item.onclick = (e) => {
             e.stopPropagation();
-            const menu = item.closest('.dots-menu');
-            if (menu) menu.style.display = 'none';
+            item.closest('.dots-menu').style.display = 'none';
         };
     });
 
+    // 点击页面其他区域关闭菜单
     document.onclick = () => {
         document.querySelectorAll('.dots-menu').forEach(menu => {
             menu.style.display = 'none';
@@ -145,15 +118,11 @@ function bindMoreDots() {
 
 // 提交评论
 async function submitComment(postId) {
-    if (!supabase) {
-        console.error('supabase 未初始化');
-        return;
-    }
     const input = document.querySelector(`.comment-input-${postId}`);
     const content = input.value.trim();
     if (!content) return;
 
-    await supabase.from('comments').insert([{
+    await SupabaseAPI.supabase.from('comments').insert([{
         post_id: postId,
         user_id: currentUser.id,
         content: content
